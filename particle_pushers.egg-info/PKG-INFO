@@ -1,0 +1,19 @@
+Metadata-Version: 2.4
+Name: particle-pushers
+Version: 0.0.1
+Summary: A simple Python package containing various relativistic particle pushers.
+Home-page: https://github.com/mckeon-ben/particle-pushers.git
+Author: Ben McKeon
+Author-email: Ben McKeon <mckeon.ben@ul.ie>
+License-Expression: MIT
+Project-URL: Repository, https://github.com/mckeon-ben/particle-pushers.git
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Requires-Dist: scipy
+Dynamic: author
+Dynamic: home-page
+Dynamic: requires-python
+
+# particle-pushers
+A simple ``Python`` package created to compare various particle pushers for relativistic charged particle dynamics.
