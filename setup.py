@@ -12,7 +12,7 @@ setuptools.setup(
     description='A simple Python package containing various relativistic particle pushers.',
     long_description=description,
     long_description_content_type='text/markdown',
-    url='https://github.com/gituser/test-tackage',
+    url='https://github.com/mckeon-ben/particle-pushers.git',
     license='MIT',
     python_requires='>=3.10',
     install_requires=['numpy', 'scipy']
