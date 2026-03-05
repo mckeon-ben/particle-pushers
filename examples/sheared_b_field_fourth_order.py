@@ -44,7 +44,7 @@ times = (0, 1000)
 
 # Calculating time steps.
 scales = np.linspace(5e-3, 1e-1, num=20)
-step_array = [4 * int(10**np.log10(times[-1] / scale)) for scale in scales]
+step_array = [int(10**np.log10(times[-1] / scale)) for scale in scales]
 
 # Names for each of the output arrays.
 output_names = ['x', 'u']
@@ -95,11 +95,11 @@ for integrator in integrators:
         toc = time.process_time()
 
         # Rounding CPU time.
-        cpu_time = np.round(toc - tic, 5)
+        cpu_time = np.round(toc - tic, 4)
 
         # Calculating and rounding the time step.
         diff = (times[1] - times[0]) / num_steps
-        dt = np.round(diff, 5)
+        dt = np.round(diff, 4)
 
         # Writing CPU time for each time step to a file.
         with open(cpu_time_filename, 'a') as file:
