@@ -2,7 +2,7 @@ import numpy as np
 from particle_pushers.utils import Stagger
 
 class Pusher:
-	def __init__(self, 
+	def __init__(self,
 				 x0,
 				 u0,
 				 E_field,
