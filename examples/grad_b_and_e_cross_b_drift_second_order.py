@@ -56,8 +56,8 @@ experiment_root_folder = 'experiments/grad_b_and_e_cross_b_drift/'
 data_folder = experiment_root_folder + 'data/'
 cpu_time_folder = experiment_root_folder + 'cpu_times/'
 if not os.path.exists(data_folder) or not os.path.exists(cpu_time_folder):
-    os.makedirs(data_folder)
-    os.makedirs(cpu_time_folder)
+    os.makedirs(data_folder, exist_ok=True)
+    os.makedirs(cpu_time_folder, exist_ok=True)
 
 for integrator in integrators:
     # Extracting the name of each integrator.
