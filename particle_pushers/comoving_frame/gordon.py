@@ -283,7 +283,6 @@ class GordonQuadratic(Gordon):
 
 
 class GordonFourthOrder(Gordon):
-class GordonFourthOrder(Gordon):
     '''
     Abstract base class for fourth-order Gordon-Hafizi pushers.
 
