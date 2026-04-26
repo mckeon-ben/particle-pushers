@@ -4,7 +4,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'particle-pushers'
-version = '0.0.2'
+version = '0.1.0'
 dependencies = [
   'numpy',
   'scipy'
@@ -13,10 +13,10 @@ requires-python = '>=3.9'
 authors = [
   {name = 'Ben McKeon', email = 'mckeon.ben@ul.ie'}
 ]
-description = 'A simple Python package containing various relativistic particle pushers.'
+description = 'Explicit, implicit and variational integrators for relativistic charged particle tracking.'
 readme = 'README.md'
 license = 'MIT'
-license-files = ['LICENCSE.*']
+license-files = ['LICENSE.*']
 
 [project.urls]
-Repository = 'https://github.com/mckeon-ben/particle-pushers.git'
+Repository = 'https://github.com/mckeon-ben/particle-pushers'
