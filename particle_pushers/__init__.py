@@ -36,9 +36,9 @@ DiscreteGradient
 
 Comoving-frame pushers
 ----------------------
-GordonHafiziQuadratic, GordonHafiziQuadraticFourthOrder
+GordonQuadratic, GordonQuadraticFourthOrder
     Gordon-Hafizi quadratic spinor method and fourth-order extension.
-GordonHafiziExact, GordonHafiziExactFourthOrder
+GordonExact, GordonExactFourthOrder
     Gordon-Hafizi exact spinor method and fourth-order extension.
 HairerExplicit
     Hairer-Lubich-Shi explicit leapfrog method.
@@ -57,7 +57,7 @@ from .lab_frame import (
     Lapenta, Petri, DiscreteGradient
 )
 from .comoving_frame import (
-    GordonHafiziExact, GordonHafiziExactFourthOrder,
-    GordonHafiziQuadratic, GordonHafiziQuadraticFourthOrder,
+    GordonExact, GordonExactFourthOrder,
+    GordonQuadratic, GordonQuadraticFourthOrder,
     HairerExplicit, HairerVariational, HairerDiscreteGradient
 )
