@@ -1,14 +1,14 @@
 # particle-pushers
 
-A Python package implementing a suite of explicit, implicit, and variational integrators for tracking relativistic charged test particles in static and time-dependent electromagnetic fields. All quantities are in natural units where *c* = 1.
+A Python package implementing a suite of numerical integrators for tracking relativistic charged test particles in static and time-dependent electromagnetic fields. All quantities are in natural units where *c* = 1.
 
 ## Features
 
-- **Lab-frame pushers** — Boris, Vay, and Higuera-Cary methods, each available in second-order, fourth-order Yoshida, and adaptive variants
-- **Implicit lab-frame pushers** — Lapenta-Markidis, Pétri, and discrete gradient methods
-- **Comoving-frame pushers** — Gordon-Hafizi exact and quadratic spinor methods, each available in second and fourth order
-- **Hairer-Lubich-Shi pushers** — explicit, variational leapfrog, and implicit discrete gradient methods
-- **Flexible field interface** — static, time-dependent, and superposed electromagnetic fields with optional scalar and vector potentials
+- **Lab-frame pushers:** Boris, Vay, and Higuera-Cary methods, each available in second-order, fourth-order Yoshida, and adaptive sub-cycling variants
+- **Implicit lab-frame pushers:** Lapenta-Markidis, Pétri, and discrete gradient methods
+- **Comoving-frame pushers:** Gordon-Hafizi exact and quadratic spinor methods, each available in second and fourth order
+- **Hairer-Lubich-Shi pushers:** explicit, discrete gradient, and variational leapfrog methods
+- **Flexible field interface:** static, time-dependent, and superposed electromagnetic fields with optional scalar and vector potentials
 
 ## Installation
 
@@ -48,15 +48,15 @@ t, x, u = sim.solve(t_span=(0, 2 * np.pi), N=1000)
 | Method | Class | Order |
 |---|---|---|
 | Boris | `Boris` | 2 |
-| Boris | `BorisFourthOrder` | 4 |
+| Boris (fourth-order) | `BorisFourthOrder` | 4 |
 | Boris (adaptive, fourth-order) | `BorisAdaptiveFourthOrder` | 2/4 |
 | Boris (adaptive, sub-cycling) | `BorisAdaptiveSubstep` | 2 |
 | Vay | `Vay` | 2 |
-| Vay | `VayFourthOrder` | 4 |
+| Vay (fourth-order) | `VayFourthOrder` | 4 |
 | Vay (adaptive, fourth-order) | `VayAdaptiveFourthOrder` | 2/4 |
 | Vay (adaptive, sub-cycling) | `VayAdaptiveSubstep` | 2 |
 | Higuera-Cary | `Higuera` | 2 |
-| Higuera-Cary | `HigueraFourthOrder` | 4 |
+| Higuera-Cary (fourth-order) | `HigueraFourthOrder` | 4 |
 | Higuera-Cary (adaptive, fourth-order) | `HigueraAdaptiveFourthOrder` | 2/4 |
 | Higuera-Cary (adaptive, sub-cycling) | `HigueraAdaptiveSubstep` | 2 |
 | Lapenta-Markidis | `Lapenta` | 2 |

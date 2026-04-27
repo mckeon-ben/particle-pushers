@@ -13,7 +13,7 @@ requires-python = '>=3.9'
 authors = [
   {name = 'Ben McKeon', email = 'mckeon.ben@ul.ie'}
 ]
-description = 'Explicit, implicit and variational integrators for relativistic charged particle tracking.'
+description = 'A suite of numerical integrators for relativistic charged particle tracking.'
 readme = 'README.md'
 license = 'MIT'
 license-files = ['LICENSE.*']
