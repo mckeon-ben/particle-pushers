@@ -68,9 +68,9 @@ t, x, u = sim.solve(t_span=(0, 2 * np.pi), N=1000)
 | Method | Class | Order |
 |---|---|---|
 | Gordon-Hafizi (exact) | `GordonExact` | 2 |
-| Gordon-Hafizi (exact) | `GordonExactFourthOrder` | 4 |
+| Gordon-Hafizi (exact, fourth-order) | `GordonExactFourthOrder` | 4 |
 | Gordon-Hafizi (quadratic) | `GordonQuadratic` | 2 |
-| Gordon-Hafizi (quadratic) | `GordonQuadraticFourthOrder` | 4 |
+| Gordon-Hafizi (quadratic, fourth-order) | `GordonQuadraticFourthOrder` | 4 |
 | Hairer-Lubich-Shi (explicit) | `HairerExplicit` | 2 |
 | Hairer-Lubich-Shi (discrete gradient) | `HairerDiscreteGradient` | 2 |
 | Hairer-Lubich-Shi (variational) | `HairerVariational` | 2 |
