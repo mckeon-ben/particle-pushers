@@ -1,8 +1,10 @@
 '''
-Base class for relativistic charged particle pushers.
+Base classes for relativistic charged particle pushers.
 
 Provides the common interface and integration loop shared by all
-pusher implementations. All quantities are in natural units where c = 1.
+pusher implementations, and an adaptive base class for pushers
+that track the number of adaptive steps taken during integration.
+All quantities are in natural units where c = 1.
 '''
 
 import numpy as np
@@ -38,14 +40,19 @@ class Pusher:
     q_over_m : float
         Charge-to-mass ratio of the particle.
 
+    See Also
+    --------
+    AdaptivePusher : Extended base class for adaptive pushers that
+        track the number of adaptive steps taken during integration.
+
     Examples
     --------
     Concrete pushers are instantiated directly rather than through
     the base class:
 
-    >>> field = StaticField(B_func=lambda x: [0., 0., 1.])
-    >>> particle = Particle(x=[1., 0., 0.],
-    ...                     u=[0., 1., 0.],
+    >>> field = StaticField(B_func=lambda x: np.array([0., 0., 1.]))
+    >>> particle = Particle(x=np.array([1., 0., 0.]),
+    ...                     u=np.array([0., 1., 0.]),
     ...                     q=1., m=1.)
     >>> sim = Boris(particle, field)
     >>> t, x, u = sim.solve(t_span=(0, 2 * np.pi), N=1000)
@@ -123,3 +130,54 @@ class Pusher:
             self.particle.u = u_out[n + 1]
 
         return t, x_out, u_out
+
+
+class AdaptivePusher(Pusher):
+    '''
+    Abstract base class for adaptive particle pushers.
+
+    Extends the base Pusher class with a step counter that tracks
+    the number of steps for which the adaptive branch was taken
+    during the most recent solve() call.
+
+    Attributes
+    ----------
+    n_adaptive_steps : int
+        Number of steps in the most recent solve() call for which
+        the adaptive branch was used. Reset to zero at the start
+        of each solve() call.
+
+    See Also
+    --------
+        Pusher : Base class providing the integration loop and common
+            interface for all pushers.
+    '''
+
+    def solve(self, t_span, N):
+        '''
+        Integrate the equations of motion over a given time interval.
+
+        Resets the adaptive step counter before integration begins.
+        The number of adaptive steps taken is available via
+        self.n_adaptive_steps after the call returns.
+
+        Parameters
+        ----------
+        t_span : tuple of float
+            Integration interval (t_start, t_end).
+        N : int
+            Number of time steps.
+
+        Returns
+        -------
+        t : np.ndarray
+            Time array at integer steps, shape (N + 1,).
+        x_out : np.ndarray
+            Particle position array, shape (N + 1, n_dims), where
+            n_dims is 3 for lab-frame pushers or 4 for comoving-frame
+            pushers.
+        u_out : np.ndarray
+            Particle velocity array, shape (N + 1, n_dims).
+        '''
+        self.n_adaptive_steps = 0
+        return super().solve(t_span, N)

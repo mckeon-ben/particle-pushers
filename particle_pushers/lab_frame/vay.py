@@ -17,7 +17,7 @@ integrators. Physics letters A, 150(5-7), pp.262-268.
 '''
 
 import numpy as np
-from ..pusher import Pusher
+from ..pusher import Pusher, AdaptivePusher
 from ..gamma import Gamma
 
 
@@ -214,41 +214,7 @@ class VayFourthOrder(Vay):
         return x, u
 
 
-class VayAdaptiveFourthOrder(VayFourthOrder):
-    '''
-    Adaptive Vay pusher switching between second and fourth order.
-
-    Uses the magnetic rotation half-angle to determine whether to
-    apply the standard second-order Vay step or the fourth-order
-    Yoshida composition. The fourth-order scheme is used when the
-    half-angle exceeds the threshold, indicating that the particle
-    is gyrating rapidly relative to the time step.
-
-    Attributes
-    ----------
-    threshold : float
-        Half-angle threshold in radians above which the fourth-order
-        scheme is used. Default is 0.05.
-    '''
-
-    threshold = 0.05
-
-    def advance(self, t_n, dt):
-        x, u = self.particle.x, self.particle.u
-        t_mid = t_n + dt / 2
-        x_mid = x + u / Gamma(u) * (dt / 2)
-        E, B = self._compute_fields(x_mid, t_mid)
-        half_angle = self._compute_half_angle(u, E, B, dt)
-        if half_angle > self.threshold:
-            for c in self.coeffs:
-                x, u = self._step(x, u, t_n, c * dt)
-                t_n += c * dt
-        else:
-            x, u = self._step(x, u, t_n, dt, E=E, B=B)
-        return x, u
-
-
-class VayAdaptiveSubstep(Vay):
+class VayAdaptiveSubstep(Vay, AdaptivePusher):
     '''
     Adaptive Vay pusher with sub-cycling for rapid gyration.
 
@@ -265,6 +231,10 @@ class VayAdaptiveSubstep(Vay):
         is used. Default is 0.05.
     n_substeps : int
         Number of sub-steps to use when sub-cycling. Default is 4.
+    n_adaptive_steps : int
+        Number of steps in the most recent solve() call for which
+        sub-cycling was used. Reset to zero at the start of each
+        solve() call.
     '''
 
     threshold = 0.05
@@ -277,10 +247,50 @@ class VayAdaptiveSubstep(Vay):
         E, B = self._compute_fields(x_mid, t_mid)
         half_angle = self._compute_half_angle(u, E, B, dt)
         if half_angle > self.threshold:
+            self.n_adaptive_steps += 1
             dt_sub = dt / self.n_substeps
             for n in range(self.n_substeps):
                 x, u = self._step(x, u, t_n, dt_sub)
                 t_n += dt_sub
+        else:
+            x, u = self._step(x, u, t_n, dt, E=E, B=B)
+        return x, u
+
+
+class VayAdaptiveFourthOrder(VayFourthOrder, AdaptivePusher):
+    '''
+    Adaptive Vay pusher switching between second and fourth order.
+
+    Uses the magnetic rotation half-angle to determine whether to
+    apply the standard second-order Vay step or the fourth-order
+    Yoshida composition. The fourth-order scheme is used when the
+    half-angle exceeds the threshold, indicating that the particle
+    is gyrating rapidly relative to the time step.
+
+    Attributes
+    ----------
+    threshold : float
+        Half-angle threshold in radians above which the fourth-order
+        scheme is used. Default is 0.05.
+    n_adaptive_steps : int
+        Number of steps in the most recent solve() call for which
+        the fourth-order scheme was used. Reset to zero at the start
+        of each solve() call.
+    '''
+
+    threshold = 0.05
+
+    def advance(self, t_n, dt):
+        x, u = self.particle.x, self.particle.u
+        t_mid = t_n + dt / 2
+        x_mid = x + u / Gamma(u) * (dt / 2)
+        E, B = self._compute_fields(x_mid, t_mid)
+        half_angle = self._compute_half_angle(u, E, B, dt)
+        if half_angle > self.threshold:
+            self.n_adaptive_steps += 1
+            for c in self.coeffs:
+                x, u = self._step(x, u, t_n, c * dt)
+                t_n += c * dt
         else:
             x, u = self._step(x, u, t_n, dt, E=E, B=B)
         return x, u
