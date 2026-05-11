@@ -48,16 +48,10 @@ t, x, u = sim.solve(t_span=(0, 2 * np.pi), N=1000)
 |---|---|---|
 | Boris | `Boris` | 2 |
 | Boris (fourth-order) | `BorisFourthOrder` | 4 |
-| Boris (adaptive, fourth-order) | `BorisAdaptiveFourthOrder` | 2/4 |
-| Boris (adaptive, sub-cycling) | `BorisAdaptiveSubstep` | 2 |
 | Vay | `Vay` | 2 |
 | Vay (fourth-order) | `VayFourthOrder` | 4 |
-| Vay (adaptive, fourth-order) | `VayAdaptiveFourthOrder` | 2/4 |
-| Vay (adaptive, sub-cycling) | `VayAdaptiveSubstep` | 2 |
 | Higuera-Cary | `Higuera` | 2 |
 | Higuera-Cary (fourth-order) | `HigueraFourthOrder` | 4 |
-| Higuera-Cary (adaptive, fourth-order) | `HigueraAdaptiveFourthOrder` | 2/4 |
-| Higuera-Cary (adaptive, sub-cycling) | `HigueraAdaptiveSubstep` | 2 |
 | Lapenta-Markidis | `Lapenta` | 2 |
 | Discrete gradient | `DiscreteGradient` | 2 |
 
@@ -66,9 +60,7 @@ t, x, u = sim.solve(t_span=(0, 2 * np.pi), N=1000)
 | Method | Class | Order |
 |---|---|---|
 | Gordon-Hafizi (exact) | `GordonExact` | 2 |
-| Gordon-Hafizi (exact, fourth-order) | `GordonExactFourthOrder` | 4 |
 | Gordon-Hafizi (quadratic) | `GordonQuadratic` | 2 |
-| Gordon-Hafizi (quadratic, fourth-order) | `GordonQuadraticFourthOrder` | 4 |
 | Hairer-Lubich-Shi (explicit) | `HairerExplicit` | 2 |
 | Hairer-Lubich-Shi (discrete gradient) | `HairerDiscreteGradient` | 2 |
 | Hairer-Lubich-Shi (variational) | `HairerVariational` | 2 |
