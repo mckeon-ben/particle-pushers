@@ -4,8 +4,8 @@ A Python package implementing a suite of numerical integrators for tracking rela
 
 ## Features
 
-- **Explicit lab-frame pushers:** Boris, Vay, and Higuera-Cary methods, each available in second-order, fourth-order Yoshida, and adaptive sub-cycling variants
-- **Implicit lab-frame pushers:** Lapenta-Markidis, and discrete gradient methods
+- **Explicit lab-frame pushers:** Boris, Vay, and Higuera-Cary methods, each available in second-order and fourth-order
+- **Implicit lab-frame pushers:** Lapenta-Markidis and discrete gradient methods
 - **Comoving-frame pushers:** Gordon-Hafizi (exact and quadratic unitary) methods and Hairer-Lubich-Shi (explicit, discrete gradient, and variational) methods
 - **Flexible field interface:** static, time-dependent, and superposed electromagnetic fields with optional scalar and vector potentials
 
