@@ -66,8 +66,8 @@ All pushers are second-order accurate, with lab-frame methods advancing in lab t
 | Method | Class |
 |---|---|
 | Explicit | `HairerExplicit` |
-| Variational | `HairerVariational` |
 | Discrete gradient | `HairerDiscreteGradient` |
+| Variational | `HairerVariational` |
 
 ## Field Classes
 
@@ -79,7 +79,7 @@ All pushers are second-order accurate, with lab-frame methods advancing in lab t
 
 ## References
 
-- Boris, J.P., 1970. Relativistic plasma simulation-optimization of a hybrid code. In *Proc. Fourth Conf. Num. Sim. Plasmas* (pp. 3-67).
+- Boris, J.P., 1970. Relativistic Plasma Simulation --- Optimization of a Hybrid Code. In *Proc. Fourth Conf. Num. Sim. Plasmas* (pp. 3-67).
 - Vay, J.L., 2008. Simulation of beams or plasmas crossing at relativistic velocity. *Physics of Plasmas, 15*(5).
 - Higuera, A.V. and Cary, J.R., 2017. Structure-preserving second-order integration of relativistic charged particle trajectories in electromagnetic fields. *Physics of Plasmas, 24*(5).
 - Lapenta, G. and Markidis, S., 2011. Particle acceleration and energy conservation in particle in cell simulations. *Physics of Plasmas, 18*(7).
