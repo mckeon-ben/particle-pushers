@@ -29,8 +29,6 @@ Higuera, HigueraFourthOrder, HigueraAdaptiveFourthOrder, HigueraAdaptiveSubstep
     Higuera-Cary method and extensions.
 Lapenta
     Lapenta-Markidis implicit method.
-Petri
-    Pétri implicit method.
 DiscreteGradient
     Discrete gradient implicit method with exact energy conservation.
 
@@ -54,7 +52,7 @@ from .lab_frame import (
     Boris, BorisFourthOrder, BorisAdaptiveFourthOrder, BorisAdaptiveSubstep,
     Vay, VayFourthOrder, VayAdaptiveFourthOrder, VayAdaptiveSubstep,
     Higuera, HigueraFourthOrder, HigueraAdaptiveFourthOrder, HigueraAdaptiveSubstep,
-    Lapenta, Petri, DiscreteGradient
+    Lapenta, DiscreteGradient
 )
 from .comoving_frame import (
     GordonExact, GordonExactFourthOrder,

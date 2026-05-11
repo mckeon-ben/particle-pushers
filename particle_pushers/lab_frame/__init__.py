@@ -17,5 +17,4 @@ from .higuera import (
     HigueraAdaptiveFourthOrder,
 )
 from .lapenta import Lapenta
-from .petri import Petri
 from .discrete_gradient import DiscreteGradient

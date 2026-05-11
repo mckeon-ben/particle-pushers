@@ -5,9 +5,8 @@ A Python package implementing a suite of numerical integrators for tracking rela
 ## Features
 
 - **Explicit lab-frame pushers:** Boris, Vay, and Higuera-Cary methods, each available in second-order, fourth-order Yoshida, and adaptive sub-cycling variants
-- **Implicit lab-frame pushers:** Lapenta-Markidis, Pétri, and discrete gradient methods
-- **Comoving-frame pushers:** Gordon-Hafizi exact and quadratic unitary methods, each available in second and fourth order
-- **Hairer-Lubich-Shi pushers:** explicit, discrete gradient, and variational leapfrog methods
+- **Implicit lab-frame pushers:** Lapenta-Markidis, and discrete gradient methods
+- **Comoving-frame pushers:** Gordon-Hafizi (second- and fourth-order exact and quadratic unitary) and Hairer-Lubich-Shi (explicit, discrete gradient, and variational) methods
 - **Flexible field interface:** static, time-dependent, and superposed electromagnetic fields with optional scalar and vector potentials
 
 ## Installation
@@ -60,7 +59,6 @@ t, x, u = sim.solve(t_span=(0, 2 * np.pi), N=1000)
 | Higuera-Cary (adaptive, fourth-order) | `HigueraAdaptiveFourthOrder` | 2/4 |
 | Higuera-Cary (adaptive, sub-cycling) | `HigueraAdaptiveSubstep` | 2 |
 | Lapenta-Markidis | `Lapenta` | 2 |
-| Pétri | `Petri` | 2 |
 | Discrete gradient | `DiscreteGradient` | 2 |
 
 ### Comoving-frame
@@ -89,7 +87,5 @@ t, x, u = sim.solve(t_span=(0, 2 * np.pi), N=1000)
 - Vay, J.L., 2008. Simulation of beams or plasmas crossing at relativistic velocity. *Physics of Plasmas, 15*(5).
 - Higuera, A.V. and Cary, J.R., 2017. Structure-preserving second-order integration of relativistic charged particle trajectories in electromagnetic fields. *Physics of Plasmas, 24*(5).
 - Lapenta, G. and Markidis, S., 2011. Particle acceleration and energy conservation in particle in cell simulations. *Physics of Plasmas, 18*(7).
-- Pétri, J., 2017. A fully implicit numerical integration of the relativistic particle equation of motion. *Journal of Plasma Physics, 83*(2), p.705830206.
-- Gordon, D.F. and Hafizi, B., 2021. Special unitary particle pusher for extreme fields. *Computer Physics Communications, 258*, p.107628.
 - Hairer, E., Lubich, C. and Shi, Y., 2023. Leapfrog methods for relativistic charged-particle dynamics. *SIAM Journal on Numerical Analysis, 61*(6), pp.2844-2858.
 - Yoshida, H., 1990. Construction of higher order symplectic integrators. *Physics letters A, 150*(5-7), pp.262-268.
