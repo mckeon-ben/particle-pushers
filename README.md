@@ -37,11 +37,18 @@ t, x, u = sim.solve(t_span=(0, 2 * np.pi), N=1000)
 
 ### Lab-frame
 
+**Explicit**
+
 | Method | Class |
 |---|---|
 | Boris | `Boris` |
 | Vay | `Vay` |
 | Higuera-Cary | `Higuera` |
+
+**Implicit**
+
+| Method | Class |
+|---|---|
 | Lapenta-Markidis | `Lapenta` |
 | Discrete gradient | `DiscreteGradient` |
 
