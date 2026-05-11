@@ -2,13 +2,6 @@
 
 A Python package implementing a suite of numerical integrators for tracking relativistic charged test particles in static and time-dependent electromagnetic fields. All quantities are in natural units where *c* = 1.
 
-## Features
-
-- **Explicit lab-frame pushers:** Boris, Vay, and Higuera-Cary methods
-- **Implicit lab-frame pushers:** Lapenta-Markidis and discrete gradient methods
-- **Comoving-frame pushers:** Gordon-Hafizi (exact and quadratic unitary) methods and Hairer-Lubich-Shi (explicit, discrete gradient, and variational) methods
-- **Flexible field interface:** static, time-dependent, and superposed electromagnetic fields with optional scalar and vector potentials
-
 ## Installation
 
 Clone the repository and install in editable mode:
@@ -54,13 +47,20 @@ t, x, u = sim.solve(t_span=(0, 2 * np.pi), N=1000)
 
 ### Comoving-frame
 
+**Gordon-Hafizi**
+
 | Method | Class |
 |---|---|
-| Gordon-Hafizi (exact) | `GordonExact` |
-| Gordon-Hafizi (quadratic) | `GordonQuadratic` |
-| Hairer-Lubich-Shi (explicit) | `HairerExplicit` |
-| Hairer-Lubich-Shi (discrete gradient) | `HairerDiscreteGradient` |
-| Hairer-Lubich-Shi (variational) | `HairerVariational` |
+| Exact | `GordonExact` |
+| Quadratic | `GordonQuadratic` |
+
+**Hairer-Lubich-Shi**
+
+| Method | Class |
+|---|---|
+| Explicit | `HairerExplicit` |
+| Variational | `HairerVariational` |
+| Discrete gradient | `HairerDiscreteGradient` |
 
 ## Field Classes
 
