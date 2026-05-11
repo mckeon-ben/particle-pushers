@@ -35,7 +35,7 @@ t, x, u = sim.solve(t_span=(0, 2 * np.pi), N=1000)
 
 ## Available Pushers
 
-### Lab-frame
+### Lab Frame
 
 **Explicit**
 
@@ -52,7 +52,7 @@ t, x, u = sim.solve(t_span=(0, 2 * np.pi), N=1000)
 | Lapenta-Markidis | `Lapenta` |
 | Discrete gradient | `DiscreteGradient` |
 
-### Comoving-frame
+### Comoving Frame
 
 **Gordon-Hafizi**
 
