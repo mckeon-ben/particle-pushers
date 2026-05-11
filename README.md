@@ -4,7 +4,7 @@ A Python package implementing a suite of numerical integrators for tracking rela
 
 ## Features
 
-- **Explicit lab-frame pushers:** Boris, Vay, and Higuera-Cary methods, each available in second-order and fourth-order
+- **Explicit lab-frame pushers:** Boris, Vay, and Higuera-Cary methods
 - **Implicit lab-frame pushers:** Lapenta-Markidis and discrete gradient methods
 - **Comoving-frame pushers:** Gordon-Hafizi (exact and quadratic unitary) methods and Hairer-Lubich-Shi (explicit, discrete gradient, and variational) methods
 - **Flexible field interface:** static, time-dependent, and superposed electromagnetic fields with optional scalar and vector potentials
@@ -44,26 +44,23 @@ t, x, u = sim.solve(t_span=(0, 2 * np.pi), N=1000)
 
 ### Lab-frame
 
-| Method | Class | Order |
-|---|---|---|
-| Boris | `Boris` | 2 |
-| Boris (fourth-order) | `BorisFourthOrder` | 4 |
-| Vay | `Vay` | 2 |
-| Vay (fourth-order) | `VayFourthOrder` | 4 |
-| Higuera-Cary | `Higuera` | 2 |
-| Higuera-Cary (fourth-order) | `HigueraFourthOrder` | 4 |
-| Lapenta-Markidis | `Lapenta` | 2 |
-| Discrete gradient | `DiscreteGradient` | 2 |
+| Method | Class |
+|---|---|
+| Boris | `Boris` |
+| Vay | `Vay` |
+| Higuera-Cary | `Higuera` |
+| Lapenta-Markidis | `Lapenta` |
+| Discrete gradient | `DiscreteGradient` |
 
 ### Comoving-frame
 
-| Method | Class | Order |
-|---|---|---|
-| Gordon-Hafizi (exact) | `GordonExact` | 2 |
-| Gordon-Hafizi (quadratic) | `GordonQuadratic` | 2 |
-| Hairer-Lubich-Shi (explicit) | `HairerExplicit` | 2 |
-| Hairer-Lubich-Shi (discrete gradient) | `HairerDiscreteGradient` | 2 |
-| Hairer-Lubich-Shi (variational) | `HairerVariational` | 2 |
+| Method | Class |
+|---|---|
+| Gordon-Hafizi (exact) | `GordonExact` |
+| Gordon-Hafizi (quadratic) | `GordonQuadratic` |
+| Hairer-Lubich-Shi (explicit) | `HairerExplicit` |
+| Hairer-Lubich-Shi (discrete gradient) | `HairerDiscreteGradient` |
+| Hairer-Lubich-Shi (variational) | `HairerVariational` |
 
 ## Field Classes
 
@@ -80,4 +77,3 @@ t, x, u = sim.solve(t_span=(0, 2 * np.pi), N=1000)
 - Higuera, A.V. and Cary, J.R., 2017. Structure-preserving second-order integration of relativistic charged particle trajectories in electromagnetic fields. *Physics of Plasmas, 24*(5).
 - Lapenta, G. and Markidis, S., 2011. Particle acceleration and energy conservation in particle in cell simulations. *Physics of Plasmas, 18*(7).
 - Hairer, E., Lubich, C. and Shi, Y., 2023. Leapfrog methods for relativistic charged-particle dynamics. *SIAM Journal on Numerical Analysis, 61*(6), pp.2844-2858.
-- Yoshida, H., 1990. Construction of higher order symplectic integrators. *Physics letters A, 150*(5-7), pp.262-268.
