@@ -4,12 +4,10 @@ A Python package implementing a suite of numerical integrators for tracking rela
 
 ## Installation
 
-Clone the repository and install in editable mode:
-
 ```bash
 git clone https://github.com/mckeon-ben/particle-pushers.git
 cd particle-pushers
-pip install -e .
+pip install .
 ```
 
 ## Quick Start
