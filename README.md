@@ -35,7 +35,7 @@ t, x, u = sim.solve(t_span=(0, 2 * np.pi), N=1000)
 
 ## Available Pushers
 
-All lab frame pushers are second-order accurate in the lab time step $\Delta t$. Similarly, all comoving frame pushers are second-order accurate in the proper time step $\Delta \tau$.
+All pushers are second-order accurate, with lab-frame methods advancing in lab time and comoving-frame methods advancing in proper time.
 
 ### Lab frame
 
