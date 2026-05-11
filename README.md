@@ -35,7 +35,7 @@ t, x, u = sim.solve(t_span=(0, 2 * np.pi), N=1000)
 
 ## Available Pushers
 
-All methods are second-order accurate.
+All numerical methods are second-order accurate.
 
 ### Lab frame
 
