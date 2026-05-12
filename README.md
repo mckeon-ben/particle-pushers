@@ -36,7 +36,7 @@ particle = Particle(
 
 # Run the Boris pusher.
 sim = Boris(particle, field)
-t, x, u = sim.solve(t_span=(0., 20 * np.pi), N=1000)
+t, x, u = sim.solve((0., 20 * np.pi), N=1000)
 ```
 
 ### Comoving-frame pusher
@@ -66,7 +66,7 @@ particle = Particle(x=x0, u=u0, q=1., m=1.)
 
 # Run the Gordon-Hafizi exact pusher in proper time.
 sim = GordonExact(particle, field)
-tau, x, u = sim.solve(t_span=(0., 20 * np.pi), N=1000)
+tau, x, u = sim.solve((0., 20 * np.pi), N=1000)
 ```
 
 ## Available Pushers
