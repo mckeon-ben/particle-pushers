@@ -67,14 +67,15 @@ class Vay(Pusher):
         u_prime = u_half + E * self.q_over_m * (dt / 2)
         u_star = np.dot(u_prime, tau)
         gamma_prime = lorentz_gamma(u_prime)
-        sigma = gamma_prime**2 - np.linalg.norm(tau)**2
+        tau_sq = np.dot(tau, tau)
+        sigma = gamma_prime**2 - tau_sq
 
         # Lorentz gamma factor after rotation in B-field.
-        gamma_new = np.sqrt((sigma + np.sqrt(sigma**2 + 4 * (np.linalg.norm(tau)**2 + u_star**2))) / 2)
+        gamma_new = np.sqrt((sigma + np.sqrt(sigma**2 + 4 * (tau_sq + u_star**2))) / 2)
 
         # Scaling B-field for second velocity update.
         t_vec = tau / gamma_new
-        s = 1 / (1 + np.linalg.norm(t_vec)**2)
+        s = 1 / (1 + np.dot(t_vec, t_vec))
 
         # Second velocity update after rotation in B-field.
         u_new = s * (u_prime + np.dot(u_prime, t_vec) * t_vec + np.cross(u_prime, t_vec))

@@ -35,11 +35,6 @@ class Higuera(Pusher):
     - Volume-preserving in phase space
     - Correctly captures the E×B drift velocity
 
-    References
-    ----------
-    Higuera, A.V. and Cary, J.R., 2017. Structure-preserving second-order
-    integration of relativistic charged particle trajectories in
-    electromagnetic fields. Physics of Plasmas, 24(5).
     '''
 
     def _step(self, x, u, t_n, dt):
@@ -74,14 +69,15 @@ class Higuera(Pusher):
         gamma_minus = lorentz_gamma(u_minus)
         tau = B * self.q_over_m * (dt / 2)
         u_star = np.dot(u_minus, tau)
-        sigma = gamma_minus**2 - np.linalg.norm(tau)**2
+        tau_sq = np.dot(tau, tau)
+        sigma = gamma_minus**2 - tau_sq
 
         # Lorentz gamma factor after rotation in B-field.
-        gamma_plus = np.sqrt((sigma + np.sqrt(sigma**2 + 4 * (np.linalg.norm(tau)**2 + u_star**2))) / 2)
+        gamma_plus = np.sqrt((sigma + np.sqrt(sigma**2 + 4 * (tau_sq + u_star**2))) / 2)
 
         # Scaling B-field for second velocity update.
         t_vec = tau / gamma_plus
-        s = 1 / (1 + np.linalg.norm(t_vec)**2)
+        s = 1 / (1 + np.dot(t_vec, t_vec))
 
         # Intermediate velocity after rotation in B-field.
         u_plus = s * (u_minus + np.dot(u_minus, t_vec) * t_vec + np.cross(u_minus, t_vec))

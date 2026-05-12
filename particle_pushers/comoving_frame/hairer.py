@@ -143,7 +143,18 @@ class Hairer(Pusher):
         u_out : np.ndarray
             4-velocity array at half-integer steps, shape (N, 4).
         '''
-        t_start, t_end = t_span
+        # Delegate input validation to Pusher.solve before proceeding.
+        if not isinstance(N, (int, np.integer)):
+            raise TypeError(f'N must be an integer, got {type(N).__name__}')
+        if N <= 0:
+            raise ValueError(f'N must be a positive integer, got {N}')
+        try:
+            t_start, t_end = t_span
+        except (TypeError, ValueError):
+            raise ValueError(f't_span must be a two-element sequence, got {t_span!r}')
+        if t_start >= t_end:
+            raise ValueError(f't_span must satisfy t_start < t_end, got ({t_start}, {t_end})')
+
         dt = (t_end - t_start) / N
         t = np.linspace(t_start, t_end, N + 1)
 
@@ -358,7 +369,7 @@ class HairerDiscreteGradient(Hairer):
         try:
             u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)
         except RuntimeError as e:
-            raise RuntimeError(f"HairerDiscreteGradient solver failed to converge: {e}") from e
+            raise RuntimeError(f"Hairer-Lubich-Shi discrete gradient solver failed to converge: {e}") from e
 
         x_new = x + u_new * dt
         return x_new, u_new
@@ -451,30 +462,34 @@ class HairerVariational(Hairer):
         RuntimeError
             If the fixed-point iteration fails to converge.
         '''
+        F = self._compute_F_tensor(x[1:], x[0])
+        jac = self._compute_jacobian(x[1:], x[0])
+        F_mod = F + jac
+
+        # x_prev, phi_prev, A_prev, and A4_prev depend only on x and u,
+        # both of which are fixed during iteration.
+        x_prev = x - u * dt
+        phi_prev = self.field.phi(x_prev[1:], x_prev[0])
+        A_prev = self.field.A(x_prev[1:], x_prev[0])
+        A4_prev = np.hstack((-phi_prev, A_prev))
+
+        # Precompute iteration-invariant matrix factors.
+        cayley_F_mod = self._cayley(_M_INV @ F_mod * self.q_over_m * dt / 2)
+        inv_F_mod = np.linalg.inv(np.eye(4) - _M_INV @ F_mod * self.q_over_m * dt / 2)
+
         def iteration(u_k):
-            F = self._compute_F_tensor(x[1:], x[0])
-            jac = self._compute_jacobian(x[1:], x[0])
-            F_mod = F + jac
-
             x_next = x + u_k * dt
-            x_prev = x - u * dt
-
             phi_next = self.field.phi(x_next[1:], x_next[0])
-            phi_prev = self.field.phi(x_prev[1:], x_prev[0])
             A_next = self.field.A(x_next[1:], x_next[0])
-            A_prev = self.field.A(x_prev[1:], x_prev[0])
-
             A4_next = np.hstack((-phi_next, A_next))
-            A4_prev = np.hstack((-phi_prev, A_prev))
             A_bar = (A4_next - A4_prev) / 2
-
-            return (self._cayley(_M_INV @ F_mod * self.q_over_m * dt / 2) @ u
-                    - np.linalg.inv(np.eye(4) - _M_INV @ F_mod * self.q_over_m * dt / 2) @ _M_INV @ A_bar)
+            return (cayley_F_mod @ u
+                    - inv_F_mod @ _M_INV @ A_bar)
 
         try:
             u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)
         except RuntimeError as e:
-            raise RuntimeError(f"HairerVariational solver failed to converge: {e}") from e
+            raise RuntimeError(f"Hairer-Lubich-Shi variational solver failed to converge: {e}") from e
 
         x_new = x + u_new * dt
         return x_new, u_new
