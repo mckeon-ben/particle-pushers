@@ -1,8 +1,8 @@
 '''
 Hairer-Lubich-Shi comoving-frame particle pushers.
 
-Implements the Hairer-Lubich-Shi family of covariant particle pushers
-for relativistic charged particle tracking in the particle's comoving
+Implements the Hairer-Lubich-Shi family of particle pushers for
+relativistic charged particle tracking in the particle's comoving
 frame. All methods use a staggered leapfrog scheme in which positions
 are stored at integer proper time steps and velocities are stored at
 half-integer proper time steps.
@@ -20,14 +20,15 @@ Analysis, 61(6), pp.2844-2858.
 
 import warnings
 import numpy as np
-from scipy.optimize import fsolve
+from abc import abstractmethod
+from scipy.optimize import fixed_point
 from ..pusher import Pusher
 from ..field import TimeDependentField
 
 
-_M_INV = np.diag([-1., 1., 1., 1.])
-'''Inverse Minkowski metric tensor. Since M = diag(-1,1,1,1), it is
-its own inverse.'''
+# Inverse Minkowski metric tensor. Since M = diag(-1,1,1,1), it is
+# its own inverse.
+_M_INV = np.diag((-1., 1., 1., 1.))
 
 
 class Hairer(Pusher):
@@ -52,7 +53,7 @@ class Hairer(Pusher):
         '''
         Construct the electromagnetic field tensor F.
 
-        Builds the 4x4 electromagnetic field tensor from the electric
+        Builds the 4×4 electromagnetic field tensor from the electric
         and magnetic field vectors. Field values are evaluated from
         self.field if not provided explicitly.
 
@@ -112,13 +113,14 @@ class Hairer(Pusher):
         '''
         F = self._compute_F_tensor(x[1:], x[0])
         u_new = (np.eye(4) + _M_INV @ F * self.q_over_m * dt / 2) @ u
-        u_new[0] = np.sqrt(1 + np.linalg.norm(u_new[1:])**2)
+        u_new[0] = np.sqrt(1 + np.dot(u_new[1:], u_new[1:]))
         x_new = x + u_new * dt
         return x_new, u_new
 
     def solve(self, t_span, N):
         '''
-        Integrate the equations of motion over proper time interval dt.
+        Integrate the equations of motion over a given proper time
+        interval.
 
         Uses a staggered leapfrog scheme in which positions are stored
         at integer proper time steps and velocities at half-integer
@@ -146,15 +148,15 @@ class Hairer(Pusher):
         t = np.linspace(t_start, t_end, N + 1)
 
         n_dims = self.particle.x.size
-        x_out = np.zeros([N + 1, n_dims])
-        u_out = np.zeros([N, n_dims])
+        x_out = np.zeros((N + 1, n_dims))
+        u_out = np.zeros((N, n_dims))
         x_out[0] = self.particle.x
 
         x_out[1], u_out[0] = self._stagger(
             self.particle.x, self.particle.u, dt
         )
         self.particle.x = x_out[1]
-        self.u = u_out[0]
+        self.particle.u = u_out[0]
 
         for n in range(1, N):
             x_out[n + 1], u_out[n] = self.advance(t[n], dt)
@@ -184,6 +186,7 @@ class Hairer(Pusher):
         '''
         return np.linalg.inv(np.eye(4) - A) @ (np.eye(4) + A)
 
+    @abstractmethod
     def _step(self, x, u, dt):
         '''
         Perform a single integration step.
@@ -205,16 +208,12 @@ class Hairer(Pusher):
             Updated 4-position at the next integer step, shape (4,).
         u_new : np.ndarray
             Updated 4-velocity at the next half-integer step, shape (4,).
-
-        Raises
-        ------
-        NotImplementedError
-            If called on the base class directly.
         '''
-        raise NotImplementedError
 
-    def advance(self, t_n, dt):
-        return self._step(self.particle.x, self.u, dt)
+    def advance(self, _t_n, dt):
+        # Lab time is carried in the zeroth component of the 4-position
+        # x[0] and advanced automatically by _step.
+        return self._step(self.particle.x, self.particle.u, dt)
 
 
 class HairerExplicit(Hairer):
@@ -231,12 +230,6 @@ class HairerExplicit(Hairer):
     - Second-order accurate in proper time step dt
     - Preserves the mass shell condition u^mu u_mu = -1 exactly
     - Volume-preserving in phase space
-
-    References
-    ----------
-    Hairer, E., Lubich, C. and Shi, Y., 2023. Leapfrog methods for
-    relativistic charged-particle dynamics. SIAM Journal on Numerical
-    Analysis, 61(6), pp.2844-2858.
     '''
 
     def _step(self, x, u, dt):
@@ -262,7 +255,6 @@ class HairerExplicit(Hairer):
         F = self._compute_F_tensor(x[1:], x[0])
         u_new = self._cayley(_M_INV @ F * self.q_over_m * dt / 2) @ u
         x_new = x + u_new * dt
-        self.u = u_new
         return x_new, u_new
 
 
@@ -273,7 +265,7 @@ class HairerDiscreteGradient(Hairer):
     Extends the explicit Hairer method to include an electric potential
     via the discrete gradient construction, which ensures exact energy
     conservation for static fields. The velocity update is obtained
-    implicitly via Newton's method at each step.
+    implicitly via fixed-point iteration at each step.
 
     Properties
     ----------
@@ -283,13 +275,7 @@ class HairerDiscreteGradient(Hairer):
 
     Warnings
     --------
-    Energy conservation is not guaranteed for time-dependent fields.
-
-    References
-    ----------
-    Hairer, E., Lubich, C. and Shi, Y., 2023. Leapfrog methods for
-    relativistic charged-particle dynamics. SIAM Journal on Numerical
-    Analysis, 61(6), pp.2844-2858.
+    Energy conservation is not guaranteed in time-dependent fields.
     '''
 
     def solve(self, t_span, N):
@@ -324,18 +310,21 @@ class HairerDiscreteGradient(Hairer):
         '''
         x_bar = (x1 + x2) / 2
         delta_x = x2[1:] - x1[1:]
+        norm_delta_x = np.linalg.norm(delta_x)
         E_bar_val = self.field.E(x_bar[1:], x_bar[0])
+        if norm_delta_x < np.finfo(float).eps:
+            return self.field.E(x1[1:], x1[0])
         phi1 = self.field.phi(x1[1:], x1[0])
         phi2 = self.field.phi(x2[1:], x2[0])
         return E_bar_val - ((phi2 - phi1 + np.dot(E_bar_val, delta_x))
-                / np.linalg.norm(delta_x)**2) * delta_x
+                / norm_delta_x**2) * delta_x
 
     def _step(self, x, u, dt):
         '''
         Perform a single implicit discrete gradient step.
 
-        Solves implicitly for the updated 4-velocity using Newton's
-        method, with the electric field replaced by the discrete
+        Solves implicitly for the updated 4-velocity using fixed-point
+        iteration, with the electric field replaced by the discrete
         gradient modified field to ensure exact energy conservation.
 
         Parameters
@@ -353,17 +342,25 @@ class HairerDiscreteGradient(Hairer):
             Updated 4-position at the next integer step, shape (4,).
         u_new : np.ndarray
             Updated 4-velocity at the next half-integer step, shape (4,).
+
+        Raises
+        ------
+        RuntimeError
+            If the fixed-point iteration fails to converge.
         '''
-        def residual(u_k):
+        def iteration(u_k):
             x_prev_half = x - u * (dt / 2)
             x_next_half = x + u_k * (dt / 2)
             E_bar = self._compute_E_bar(x_next_half, x_prev_half)
             F_bar = self._compute_F_tensor(x[1:], x[0], E=E_bar)
-            return u_k - self._cayley(_M_INV @ F_bar * self.q_over_m * dt / 2) @ u
+            return self._cayley(_M_INV @ F_bar * self.q_over_m * dt / 2) @ u
 
-        u_new = fsolve(func=residual, x0=u)
+        try:
+            u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)
+        except RuntimeError as e:
+            raise RuntimeError(f"HairerDiscreteGradient solver failed to converge: {e}") from e
+
         x_new = x + u_new * dt
-        self.u = u_new
         return x_new, u_new
 
 
@@ -377,8 +374,8 @@ class HairerVariational(Hairer):
     4-potential and a finite difference of the 4-potential to the
     explicit Hairer update.
 
-    The velocity update is obtained implicitly via Newton's method
-    at each step.
+    The velocity update is obtained implicitly via fixed-point
+    iteration at each step.
 
     Properties
     ----------
@@ -386,19 +383,14 @@ class HairerVariational(Hairer):
     - Preserves the mass shell condition u^mu u_mu = -1 up to O(dt^2)
     - Conserves the Hamiltonian H up to O(dt^2)
     - Derived from a discrete variational principle
-
-    References
-    ----------
-    Hairer, E., Lubich, C. and Shi, Y., 2023. Leapfrog methods for
-    relativistic charged-particle dynamics. SIAM Journal on Numerical
-    Analysis, 61(6), pp.2844-2858.
     '''
 
     def _compute_jacobian(self, x, t):
         '''
-        Construct the covariant derivative of the 4-potential.
+        Construct the Jacobian of the 4-potential with respect to the
+        4-position.
 
-        Assembles the 4x4 matrix partial_mu A_nu from the
+        Assembles the 4×4 matrix partial_mu A_nu from the
         electric field, partial time derivatives and spatial Jacobian
         of the vector potential.
 
@@ -412,7 +404,7 @@ class HairerVariational(Hairer):
         Returns
         -------
         A_prime : np.ndarray
-            Covariant derivative matrix partial_mu A_nu, shape (4, 4).
+            Jacobian matrix partial_mu A_nu, shape (4, 4).
         '''
         E = self.field.E(x, t)
         A_x = self.field.A_x(x, t)
@@ -431,11 +423,12 @@ class HairerVariational(Hairer):
         '''
         Perform a single implicit variational leapfrog step.
 
-        Solves implicitly for the updated 4-velocity using Newton's
-        method. The residual includes the standard Cayley transform
-        velocity update plus correction terms from the covariant
-        derivative of the 4-potential and the finite difference of
-        the 4-potential between adjacent integer positions.
+        Solves implicitly for the updated 4-velocity using fixed-point
+        iteration. The update includes the standard Cayley transform
+        velocity update plus correction terms from the Jacobian of the
+        4-potential with respect to the 4-position and the finite
+        difference of the 4-potential between adjacent integer
+        positions.
 
         Parameters
         ----------
@@ -452,8 +445,13 @@ class HairerVariational(Hairer):
             Updated 4-position at the next integer step, shape (4,).
         u_new : np.ndarray
             Updated 4-velocity at the next half-integer step, shape (4,).
+
+        Raises
+        ------
+        RuntimeError
+            If the fixed-point iteration fails to converge.
         '''
-        def residual(u_k):
+        def iteration(u_k):
             F = self._compute_F_tensor(x[1:], x[0])
             jac = self._compute_jacobian(x[1:], x[0])
             F_mod = F + jac
@@ -466,14 +464,17 @@ class HairerVariational(Hairer):
             A_next = self.field.A(x_next[1:], x_next[0])
             A_prev = self.field.A(x_prev[1:], x_prev[0])
 
-            A4_next = np.hstack([-phi_next, A_next])
-            A4_prev = np.hstack([-phi_prev, A_prev])
+            A4_next = np.hstack((-phi_next, A_next))
+            A4_prev = np.hstack((-phi_prev, A_prev))
             A_bar = (A4_next - A4_prev) / 2
 
-            return (u_k - self._cayley(_M_INV @ F_mod * self.q_over_m * dt / 2) @ u
-                    + np.linalg.inv(np.eye(4) - _M_INV @ F_mod * self.q_over_m * dt / 2) @ _M_INV @ A_bar)
+            return (self._cayley(_M_INV @ F_mod * self.q_over_m * dt / 2) @ u
+                    - np.linalg.inv(np.eye(4) - _M_INV @ F_mod * self.q_over_m * dt / 2) @ _M_INV @ A_bar)
 
-        u_new = fsolve(func=residual, x0=u)
+        try:
+            u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)
+        except RuntimeError as e:
+            raise RuntimeError(f"HairerVariational solver failed to converge: {e}") from e
+
         x_new = x + u_new * dt
-        self.u = u_new
         return x_new, u_new

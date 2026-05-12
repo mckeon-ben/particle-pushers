@@ -7,9 +7,9 @@ All quantities are in natural units where c = 1.
 import numpy as np
 
 
-def Gamma(u):
+def lorentz_gamma(u):
     '''
-    Lorentz gamma factor for a relativistic 3-velocity vector.
+    Lorentz gamma factor for a relativistic velocity vector.
 
     In natural units where c = 1 the Lorentz factor is:
 
@@ -18,7 +18,8 @@ def Gamma(u):
     Parameters
     ----------
     u : array_like
-        Relativistic 3-velocity vector, shape (3,).
+        Relativistic velocity vector. Typically shape (3,) for
+        lab-frame pushers, but any 1D array is accepted.
 
     Returns
     -------
@@ -29,12 +30,13 @@ def Gamma(u):
     --------
     Particle at rest:
 
-    >>> Gamma([0., 0., 0.])
+    >>> lorentz_gamma([0., 0., 0.])
     1.0
 
     Highly relativistic particle:
 
-    >>> Gamma([1., 0., 0.])
+    >>> lorentz_gamma([1., 0., 0.])
     1.4142135623730951
     '''
-    return np.sqrt(1 + np.linalg.norm(u)**2)
+    u = np.asarray(u)
+    return np.sqrt(1 + np.dot(u, u))

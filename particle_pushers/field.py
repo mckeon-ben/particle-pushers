@@ -24,7 +24,7 @@ class Field:
     are scalars unless otherwise stated.
     '''
 
-    def E(self, x, t) -> np.ndarray:
+    def E(self, x, t=None) -> np.ndarray:
         '''
         Electric field vector.
 
@@ -32,8 +32,8 @@ class Field:
         ----------
         x : array_like
             Spatial position vector, shape (3,).
-        t : float
-            Lab time.
+        t : float, optional
+            Lab time. Ignored for static fields.
 
         Returns
         -------
@@ -43,7 +43,7 @@ class Field:
         '''
         return np.zeros(3)
 
-    def B(self, x, t) -> np.ndarray:
+    def B(self, x, t=None) -> np.ndarray:
         '''
         Magnetic field vector.
 
@@ -51,8 +51,8 @@ class Field:
         ----------
         x : array_like
             Spatial position vector, shape (3,).
-        t : float
-            Lab time.
+        t : float, optional
+            Lab time. Ignored for static fields.
 
         Returns
         -------
@@ -62,7 +62,7 @@ class Field:
         '''
         return np.zeros(3)
 
-    def phi(self, x, t) -> float:
+    def phi(self, x, t=None) -> float:
         '''
         Electric scalar potential.
 
@@ -70,8 +70,8 @@ class Field:
         ----------
         x : array_like
             Spatial position vector, shape (3,).
-        t : float
-            Lab time.
+        t : float, optional
+            Lab time. Ignored for static fields.
 
         Returns
         -------
@@ -81,7 +81,7 @@ class Field:
         '''
         return 0.0
 
-    def A(self, x, t) -> np.ndarray:
+    def A(self, x, t=None) -> np.ndarray:
         '''
         Magnetic vector potential.
 
@@ -89,8 +89,8 @@ class Field:
         ----------
         x : array_like
             Spatial position vector, shape (3,).
-        t : float
-            Lab time.
+        t : float, optional
+            Lab time. Ignored for static fields.
 
         Returns
         -------
@@ -100,7 +100,7 @@ class Field:
         '''
         return np.zeros(3)
 
-    def phi_t(self, x, t) -> float:
+    def phi_t(self, x, t=None) -> float:
         '''
         Partial time derivative of the scalar potential.
 
@@ -108,8 +108,8 @@ class Field:
         ----------
         x : array_like
             Spatial position vector, shape (3,).
-        t : float
-            Lab time.
+        t : float, optional
+            Lab time. Ignored for static fields.
 
         Returns
         -------
@@ -119,7 +119,7 @@ class Field:
         '''
         return 0.0
 
-    def A_t(self, x, t) -> np.ndarray:
+    def A_t(self, x, t=None) -> np.ndarray:
         '''
         Partial time derivative of the vector potential.
 
@@ -127,8 +127,8 @@ class Field:
         ----------
         x : array_like
             Spatial position vector, shape (3,).
-        t : float
-            Lab time.
+        t : float, optional
+            Lab time. Ignored for static fields.
 
         Returns
         -------
@@ -138,7 +138,7 @@ class Field:
         '''
         return np.zeros(3)
 
-    def A_x(self, x, t) -> np.ndarray:
+    def A_x(self, x, t=None) -> np.ndarray:
         '''
         Spatial Jacobian of the vector potential.
 
@@ -146,8 +146,8 @@ class Field:
         ----------
         x : array_like
             Spatial position vector, shape (3,).
-        t : float
-            Lab time.
+        t : float, optional
+            Lab time. Ignored for static fields.
 
         Returns
         -------
@@ -197,28 +197,26 @@ class StaticField(Field):
         self._A = A_func
         self._A_x = A_x_func
 
-    def E(self, x, t):
+    def E(self, x, t=None):
         return np.asarray(self._E(x), dtype=float) if self._E is not None else super().E(x, t)
 
-    def B(self, x, t):
+    def B(self, x, t=None):
         return np.asarray(self._B(x), dtype=float) if self._B is not None else super().B(x, t)
 
-    def phi(self, x, t):
-        return np.asarray(self._phi(x), dtype=float) if self._phi is not None else 0.0
+    def phi(self, x, t=None):
+        return np.asarray(self._phi(x), dtype=float) if self._phi is not None else super().phi(x, t)
 
-    def A(self, x, t):
-        return np.asarray(self._A(x), dtype=float) if self._A is not None else np.zeros(3)
+    def A(self, x, t=None):
+        return np.asarray(self._A(x), dtype=float) if self._A is not None else super().A(x, t)
 
-    def phi_t(self, x, t):
-        return 0.0
+    def phi_t(self, x, t=None):
+        return super().phi_t(x, t)
 
-    def A_t(self, x, t):
-        return np.zeros(3)
+    def A_t(self, x, t=None):
+        return super().A_t(x, t)
 
-    def A_x(self, x, t):
-        if self._A_x is not None:
-            return np.asarray(self._A_x(x), dtype=float)
-        return np.zeros((3, 3))
+    def A_x(self, x, t=None):
+        return np.asarray(self._A_x(x), dtype=float) if self._A_x is not None else super().A_x(x, t)
 
 
 class TimeDependentField(Field):
@@ -251,9 +249,10 @@ class TimeDependentField(Field):
 
     Examples
     --------
-    Plane wave propagating in the z-direction, polarised in x:
+    Plane wave propagating in the z-direction, polarised in x
+    (with omega = k = 1.0 in natural units where c = 1):
 
-    >>> omega, k, E0 = 1.0, 2.0, 0.1
+    >>> omega, k, E0 = 1.0, 1.0, 0.1
     >>> E_func = lambda x, t: [E0 * np.cos(omega * t - k * x[2]), 0., 0.]
     >>> B_func = lambda x, t: [0., E0 * np.cos(omega * t - k * x[2]), 0.]
     >>> field = TimeDependentField(E_func=E_func, B_func=B_func)
@@ -276,19 +275,19 @@ class TimeDependentField(Field):
         return np.asarray(self._B(x, t), dtype=float) if self._B is not None else super().B(x, t)
 
     def phi(self, x, t):
-        return np.asarray(self._phi(x, t), dtype=float) if self._phi is not None else 0.0
+        return np.asarray(self._phi(x, t), dtype=float) if self._phi is not None else super().phi(x, t)
 
     def A(self, x, t):
-        return np.asarray(self._A(x, t), dtype=float) if self._A is not None else np.zeros(3)
+        return np.asarray(self._A(x, t), dtype=float) if self._A is not None else super().A(x, t)
 
     def phi_t(self, x, t):
-        return np.asarray(self._phi_t(x, t), dtype=float) if self._phi_t is not None else 0.0
+        return np.asarray(self._phi_t(x, t), dtype=float) if self._phi_t is not None else super().phi_t(x, t)
 
     def A_t(self, x, t):
-        return np.asarray(self._A_t(x, t), dtype=float) if self._A_t is not None else np.zeros(3)
+        return np.asarray(self._A_t(x, t), dtype=float) if self._A_t is not None else super().A_t(x, t)
 
     def A_x(self, x, t):
-        return np.asarray(self._A_x(x, t), dtype=float) if self._A_x is not None else np.zeros((3, 3))
+        return np.asarray(self._A_x(x, t), dtype=float) if self._A_x is not None else super().A_x(x, t)
 
 
 class SuperposedField(Field):
@@ -304,6 +303,11 @@ class SuperposedField(Field):
     *fields : Field
         Any number of Field objects to superpose.
 
+    Raises
+    ------
+    TypeError
+        If any argument is not a Field instance.
+
     Examples
     --------
     Background magnetic field plus a plane wave:
@@ -314,12 +318,27 @@ class SuperposedField(Field):
     '''
 
     def __init__(self, *fields):
+        if not all(isinstance(f, Field) for f in fields):
+            raise TypeError('all arguments must be Field instances')
         self.fields = fields
 
-    def E(self, x, t): return sum(f.E(x, t) for f in self.fields)
-    def B(self, x, t): return sum(f.B(x, t) for f in self.fields)
-    def phi(self, x, t): return sum(f.phi(x, t) for f in self.fields)
-    def A(self, x, t): return sum(f.A(x, t) for f in self.fields)
-    def phi_t(self, x, t): return sum(f.phi_t(x, t) for f in self.fields)
-    def A_t(self, x, t): return sum(f.A_t(x, t) for f in self.fields)
-    def A_x(self, x, t): return sum(f.A_x(x, t) for f in self.fields)
+    def E(self, x, t):
+        return sum(f.E(x, t) for f in self.fields)
+
+    def B(self, x, t):
+        return sum(f.B(x, t) for f in self.fields)
+
+    def phi(self, x, t):
+        return sum(f.phi(x, t) for f in self.fields)
+
+    def A(self, x, t):
+        return sum(f.A(x, t) for f in self.fields)
+
+    def phi_t(self, x, t):
+        return sum(f.phi_t(x, t) for f in self.fields)
+
+    def A_t(self, x, t):
+        return sum(f.A_t(x, t) for f in self.fields)
+
+    def A_x(self, x, t):
+        return sum(f.A_x(x, t) for f in self.fields)

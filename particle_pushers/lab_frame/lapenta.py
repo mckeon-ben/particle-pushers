@@ -12,9 +12,9 @@ conservation in particle in cell simulations. Physics of Plasmas, 18(7).
 '''
 
 import numpy as np
-from scipy.optimize import fsolve
+from scipy.optimize import fixed_point
 from ..pusher import Pusher
-from ..gamma import Gamma
+from ..lorentz import lorentz_gamma
 
 
 class Lapenta(Pusher):
@@ -22,10 +22,10 @@ class Lapenta(Pusher):
     Lapenta-Markidis implicit pusher for relativistic charged particle tracking.
 
     A fully implicit second-order method in which the velocity update
-    is obtained by solving a nonlinear system via Newton's method at
-    each time step. The field is evaluated at the midpoint position,
-    which is itself a function of the updated velocity, making the
-    scheme fully implicit and self-consistent.
+    is obtained by fixed-point iteration at each time step. The field
+    is evaluated at the midpoint position, which is itself a function
+    of the updated velocity, making the scheme fully implicit and
+    self-consistent.
 
     The method is designed for use in fully coupled particle-in-cell
     simulations where exact energy conservation is achieved through
@@ -45,21 +45,16 @@ class Lapenta(Pusher):
     since the back-reaction of the particle on the fields is absent.
     Exact energy conservation requires the field solver, current
     deposition and particle pusher to be fully coupled.
-
-    References
-    ----------
-    Lapenta, G. and Markidis, S., 2011. Particle acceleration and energy
-    conservation in particle in cell simulations. Physics of Plasmas, 18(7).
     '''
 
     def advance(self, t_n, dt):
         '''
         Advance the particle state by one time step.
 
-        Solves implicitly for the updated velocity using Newton's method,
-        with the electromagnetic field evaluated at the midpoint position
-        and time. The midpoint position depends on the updated velocity,
-        making the scheme fully implicit.
+        Solves implicitly for the updated velocity using fixed-point
+        iteration, with the electromagnetic field evaluated at the
+        midpoint position and time. The midpoint position depends on
+        the updated velocity, making the scheme fully implicit.
 
         Parameters
         ----------
@@ -74,24 +69,32 @@ class Lapenta(Pusher):
             Updated particle position, shape (3,).
         u_new : np.ndarray
             Updated particle relativistic 3-velocity, shape (3,).
+
+        Raises
+        ------
+        RuntimeError
+            If the fixed-point iteration fails to converge.
         '''
         x = self.particle.x
         u = self.particle.u
         t_mid = t_n + dt / 2
-        gamma_u = Gamma(u)
+        gamma_u = lorentz_gamma(u)
 
-        def residual(u_k):
-            gamma_k = Gamma(u_k)
+        def iteration(u_k):
+            gamma_k = lorentz_gamma(u_k)
             v_mid = (u_k + u) / (gamma_k + gamma_u)
             x_mid = x + v_mid * (dt / 2)
             E = self.field.E(x_mid, t_mid)
             B = self.field.B(x_mid, t_mid)
-            return u_k - u - (E + np.cross(v_mid, B)) * self.q_over_m * dt
+            return u + (E + np.cross(v_mid, B)) * self.q_over_m * dt
 
-        u_new = fsolve(func=residual, x0=u)
+        try:
+            u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)
+        except RuntimeError as e:
+            raise RuntimeError(f"Lapenta-Markidis solver failed to converge: {e}") from e
 
         # Position update using average of old and new velocities.
-        gamma_new = Gamma(u_new)
+        gamma_new = lorentz_gamma(u_new)
         x_new = x + (u + u_new) / (gamma_u + gamma_new) * dt
 
         return x_new, u_new

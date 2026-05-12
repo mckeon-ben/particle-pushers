@@ -16,10 +16,10 @@ systems. Journal of Nonlinear Science, 6(5), pp.449-467.
 
 import warnings
 import numpy as np
-from scipy.optimize import fsolve
+from scipy.optimize import fixed_point
 from ..pusher import Pusher
 from ..field import TimeDependentField
-from ..gamma import Gamma
+from ..lorentz import lorentz_gamma
 
 
 class DiscreteGradient(Pusher):
@@ -33,8 +33,8 @@ class DiscreteGradient(Pusher):
     between any two positions exactly equals the potential energy difference.
     The magnetic field does no work and is handled separately.
 
-    The velocity update is obtained by solving a nonlinear system via
-    Newton's method at each time step.
+    The velocity update is obtained by fixed-point iteration at each
+    time step.
 
     Properties
     ----------
@@ -48,11 +48,6 @@ class DiscreteGradient(Pusher):
     Energy conservation is not guaranteed for time-dependent fields,
     since the discrete gradient identity only holds when the potential
     is time-independent.
-
-    References
-    ----------
-    Gonzalez, O., 1996. Time integration and discrete Hamiltonian
-    systems. Journal of Nonlinear Science, 6(5), pp.449-467.
     '''
 
     def solve(self, t_span, N):
@@ -64,7 +59,7 @@ class DiscreteGradient(Pusher):
             )
         return super().solve(t_span, N)
 
-    def _compute_E_bar(self, x2, x1, t_mid):
+    def _compute_E_bar(self, x2, x1, t_n, dt):
         '''
         Discrete gradient modified electric field.
 
@@ -81,30 +76,38 @@ class DiscreteGradient(Pusher):
             Final spatial position vector, shape (3,).
         x1 : array_like
             Initial spatial position vector, shape (3,).
-        t_mid : float
-            Lab time at the midpoint of the step.
+        t_n : float
+            Lab time at the start of the step.
+        dt : float
+            Time step. Used to compute the midpoint time t_mid = t_n + dt / 2,
+            at which the midpoint field quantities are evaluated, and t_n at
+            which the fallback field is evaluated when x1 and x2 coincide.
 
         Returns
         -------
         np.ndarray
             Discrete gradient modified electric field, shape (3,).
         '''
+        t_mid = t_n + dt / 2
         x_bar = (x1 + x2) / 2
         delta_x = x2 - x1
+        norm_delta_x = np.linalg.norm(delta_x)
+        if norm_delta_x < np.finfo(float).eps:
+            return self.field.E(x1, t_n)
         E_bar_val = self.field.E(x_bar, t_mid)
         phi1 = self.field.phi(x1, t_mid)
         phi2 = self.field.phi(x2, t_mid)
         return ((phi1 - phi2 - np.dot(E_bar_val, delta_x))
-                / np.linalg.norm(delta_x)**2) * delta_x + E_bar_val
+                / norm_delta_x**2) * delta_x + E_bar_val
 
     def advance(self, t_n, dt):
         '''
         Advance the particle state by one time step.
 
-        Solves implicitly for the updated velocity using Newton's method,
-        with the electric field replaced by the discrete gradient modified
-        field to ensure exact energy conservation. The magnetic field is
-        evaluated at the midpoint position.
+        Solves implicitly for the updated velocity using fixed-point
+        iteration, with the electric field replaced by the discrete
+        gradient modified field to ensure exact energy conservation.
+        The magnetic field is evaluated at the midpoint position.
 
         Parameters
         ----------
@@ -119,25 +122,32 @@ class DiscreteGradient(Pusher):
             Updated particle position, shape (3,).
         u_new : np.ndarray
             Updated particle relativistic 3-velocity, shape (3,).
+
+        Raises
+        ------
+        RuntimeError
+            If the fixed-point iteration fails to converge.
         '''
         x = self.particle.x
         u = self.particle.u
-        t_mid = t_n + dt / 2
-        gamma_u = Gamma(u)
+        gamma_u = lorentz_gamma(u)
 
-        def residual(u_k):
-            gamma_k = Gamma(u_k)
+        def iteration(u_k):
+            gamma_k = lorentz_gamma(u_k)
             v_mid = (u_k + u) / (gamma_k + gamma_u)
             x_mid = x + v_mid * (dt / 2)
             x_next = x + v_mid * dt
-            E_bar = self._compute_E_bar(x_next, x, t_mid)
-            B = self.field.B(x_mid, t_mid)
-            return u_k - u - (E_bar + np.cross(v_mid, B)) * self.q_over_m * dt
+            E_bar = self._compute_E_bar(x_next, x, t_n, dt)
+            B = self.field.B(x_mid, t_n + dt / 2)
+            return u + (E_bar + np.cross(v_mid, B)) * self.q_over_m * dt
 
-        u_new = fsolve(func=residual, x0=u)
+        try:
+            u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)
+        except RuntimeError as e:
+            raise RuntimeError(f"Discrete gradient solver failed to converge: {e}") from e
 
         # Position update using average of old and new velocities.
-        gamma_new = Gamma(u_new)
+        gamma_new = lorentz_gamma(u_new)
         x_new = x + (u + u_new) / (gamma_u + gamma_new) * dt
 
         return x_new, u_new
