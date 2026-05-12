@@ -34,7 +34,6 @@ class Higuera(Pusher):
     - Second-order accurate in dt
     - Volume-preserving in phase space
     - Correctly captures the E×B drift velocity
-
     '''
 
     def _step(self, x, u, t_n, dt):

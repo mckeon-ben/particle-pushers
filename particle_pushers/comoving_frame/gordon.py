@@ -15,6 +15,7 @@ for extreme fields. Computer Physics Communications, 258, p.107628.
 '''
 
 import numpy as np
+from abc import abstractmethod
 from ..pusher import Pusher
 
 
@@ -111,6 +112,7 @@ class Gordon(Pusher):
         F_spin = _vector_to_spinor(F4)
         return F_spin, F_amplitude
 
+    @abstractmethod
     def _compute_time_operator(self, F, F_amplitude, dt):
         '''
         Compute the time evolution operator for the velocity spinor.
@@ -130,13 +132,7 @@ class Gordon(Pusher):
         -------
         np.ndarray
             Time evolution operator, shape (2, 2).
-
-        Raises
-        ------
-        NotImplementedError
-            If called on the base class directly.
         '''
-        raise NotImplementedError
 
     def _step(self, x, u, dt):
         '''

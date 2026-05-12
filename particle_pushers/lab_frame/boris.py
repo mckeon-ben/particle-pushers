@@ -57,7 +57,7 @@ class Boris(Pusher):
         E, B = self.field.E(x_mid, t_n + dt / 2), self.field.B(x_mid, t_n + dt / 2)
         u_minus = u + E * self.q_over_m * (dt / 2)
         t_vec = (B / lorentz_gamma(u_minus)) * self.q_over_m * (dt / 2)
-        s = (2 * t_vec) / (1 + np.linalg.norm(t_vec)**2)
+        s = (2 * t_vec) / (1 + np.dot(t_vec, t_vec))
         u_plus = u_minus + np.cross((u_minus + np.cross(u_minus, t_vec)), s)
         u_new = u_plus + E * self.q_over_m * (dt / 2)
         x_new = x_mid + u_new / lorentz_gamma(u_new) * (dt / 2)

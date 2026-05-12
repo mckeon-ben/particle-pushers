@@ -56,7 +56,7 @@ class Pusher(ABC):
     ...                     u=np.array([0., 1., 0.]),
     ...                     q=1., m=1.)
     >>> sim = Boris(particle, field)
-    >>> t, x, u = sim.solve(t_span=(0, 2 * np.pi), N=1000)
+    >>> t, x, u = sim.solve((0, 2 * np.pi), N=1000)
     '''
 
     def __init__(self, particle: Particle, field: Field):
