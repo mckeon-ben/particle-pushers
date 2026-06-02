@@ -39,6 +39,18 @@ sim = Boris(particle, field)
 t, x, u = sim.solve((0., 20 * np.pi), N=1000)
 ```
 
+A fourth-order variant is available for each explicit lab-frame method
+(`BorisOrderFour`, `VayOrderFour`, `HigueraOrderFour`). It shares the
+interface of its second-order counterpart and takes the same 3-vector
+particle; only the class name changes.
+
+```python
+from particle_pushers import BorisOrderFour
+
+sim = BorisOrderFour(particle, field)
+t, x, u = sim.solve((0., 20 * np.pi), N=1000)
+```
+
 ### Comoving-frame pusher
 
 Comoving-frame pushers use 4-vectors for position and velocity. The
@@ -69,32 +81,15 @@ sim = GordonExact(particle, field)
 tau, x, u = sim.solve((0., 20 * np.pi), N=1000)
 ```
 
-### Fourth-order pushers
-
-Fourth-order variants share the interface of their second-order counterparts
-and are constructed in exactly the same way; only the class name changes.
+A fourth-order variant is available for each Gordon-Hafizi method
+(`GordonExactOrderFour`, `GordonQuadraticOrderFour`). It shares the interface
+of its second-order counterpart and takes the same 4-vector particle; only
+the class name changes.
 
 ```python
-import numpy as np
-from particle_pushers import BorisOrderFour, GordonExactOrderFour
-from particle_pushers import StaticField, Particle, lorentz_gamma
+from particle_pushers import GordonExactOrderFour
 
-field = StaticField(B_func=lambda x: np.array([0., 0., 1.]))
-
-# Lab-frame fourth-order Boris (3-vector particle).
-lab_particle = Particle(x=np.array([1., 0., 0.]),
-                        u=np.array([0., 0.5, 0.]), q=1., m=1.)
-sim = BorisOrderFour(lab_particle, field)
-t, x, u = sim.solve((0., 20 * np.pi), N=1000)
-
-# Comoving-frame fourth-order Gordon-Hafizi exact (4-vector particle).
-u3 = np.array([0., 0.5, 0.])
-comoving_particle = Particle(
-    x=np.array([0., 1., 0., 0.]),
-    u=np.array([lorentz_gamma(u3), u3[0], u3[1], u3[2]]),
-    q=1., m=1.
-)
-sim = GordonExactOrderFour(comoving_particle, field)
+sim = GordonExactOrderFour(particle, field)
 tau, x, u = sim.solve((0., 20 * np.pi), N=1000)
 ```
 
