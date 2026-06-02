@@ -4,9 +4,11 @@ particle_pushers: relativistic charged particle pushers for electromagnetic fiel
 A Python package implementing various explicit and implicit numerical
 integrators for tracking relativistic charged test particles in static
 and time-dependent electromagnetic fields. All quantities are in natural
-units where c = 1. All pushers are second-order accurate, with lab-frame
-methods integrating in lab time and comoving-frame methods integrating
-in proper time.
+units where c = 1. Lab-frame methods integrate in lab time and
+comoving-frame methods integrate in proper time. The base methods are
+second-order accurate; fourth-order variants of the explicit lab-frame
+methods and the Gordon-Hafizi methods are provided via Yoshida triple-jump
+composition.
 
 Classes
 -------
@@ -30,10 +32,16 @@ Lab-frame pushers
 -----------------
 Boris
     Boris leapfrog method.
+BorisOrderFour
+    Fourth-order Boris method via Yoshida composition.
 Vay
     Vay leapfrog method.
+VayOrderFour
+    Fourth-order Vay method via Yoshida composition.
 Higuera
     Higuera-Cary leapfrog method.
+HigueraOrderFour
+    Fourth-order Higuera-Cary method via Yoshida composition.
 Lapenta
     Lapenta-Markidis implicit method.
 DiscreteGradient
@@ -43,8 +51,12 @@ Comoving-frame pushers
 ----------------------
 GordonExact
     Gordon-Hafizi exact unitary method.
+GordonExactOrderFour
+    Fourth-order Gordon-Hafizi exact method via Yoshida composition.
 GordonQuadratic
     Gordon-Hafizi quadratic unitary method.
+GordonQuadraticOrderFour
+    Fourth-order Gordon-Hafizi quadratic method via Yoshida composition.
 HairerExplicit
     Hairer-Lubich-Shi explicit leapfrog method.
 HairerDiscreteGradient
@@ -56,8 +68,14 @@ HairerVariational
 from .field import Field, StaticField, TimeDependentField, SuperposedField
 from .particle import Particle
 from .lorentz import lorentz_gamma
-from .lab_frame import Boris, Vay, Higuera, Lapenta, DiscreteGradient
+from .lab_frame import (
+    Boris, BorisOrderFour,
+    Vay, VayOrderFour,
+    Higuera, HigueraOrderFour,
+    Lapenta, DiscreteGradient,
+)
 from .comoving_frame import (
-    GordonExact, GordonQuadratic,
+    GordonExact, GordonExactOrderFour,
+    GordonQuadratic, GordonQuadraticOrderFour,
     HairerExplicit, HairerDiscreteGradient, HairerVariational
 )

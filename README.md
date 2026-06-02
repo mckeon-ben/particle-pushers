@@ -69,20 +69,51 @@ sim = GordonExact(particle, field)
 tau, x, u = sim.solve((0., 20 * np.pi), N=1000)
 ```
 
+### Fourth-order pushers
+
+Fourth-order variants share the interface of their second-order counterparts
+and are constructed in exactly the same way; only the class name changes.
+
+```python
+import numpy as np
+from particle_pushers import BorisOrderFour, GordonExactOrderFour
+from particle_pushers import StaticField, Particle, lorentz_gamma
+
+field = StaticField(B_func=lambda x: np.array([0., 0., 1.]))
+
+# Lab-frame fourth-order Boris (3-vector particle).
+lab_particle = Particle(x=np.array([1., 0., 0.]),
+                        u=np.array([0., 0.5, 0.]), q=1., m=1.)
+sim = BorisOrderFour(lab_particle, field)
+t, x, u = sim.solve((0., 20 * np.pi), N=1000)
+
+# Comoving-frame fourth-order Gordon-Hafizi exact (4-vector particle).
+u3 = np.array([0., 0.5, 0.])
+comoving_particle = Particle(
+    x=np.array([0., 1., 0., 0.]),
+    u=np.array([lorentz_gamma(u3), u3[0], u3[1], u3[2]]),
+    q=1., m=1.
+)
+sim = GordonExactOrderFour(comoving_particle, field)
+tau, x, u = sim.solve((0., 20 * np.pi), N=1000)
+```
+
 ## Available Pushers
 
-All pushers are second-order accurate, with lab-frame methods advancing
-in lab time and comoving-frame methods advancing in proper time.
+Lab-frame methods advance in lab time and comoving-frame methods advance in
+proper time. The base methods are second-order accurate. Fourth-order variants
+of the explicit lab-frame methods and the Gordon-Hafizi methods are provided
+via Yoshida triple-jump composition.
 
 ### Lab frame
 
 **Explicit**
 
-| Method | Class |
-|:---|:---|
-| Boris | `Boris` |
-| Vay | `Vay` |
-| Higuera-Cary | `Higuera` |
+| Method | Class (2nd order) | Class (4th order) |
+|:---|:---|:---|
+| Boris | `Boris` | `BorisOrderFour` |
+| Vay | `Vay` | `VayOrderFour` |
+| Higuera-Cary | `Higuera` | `HigueraOrderFour` |
 
 **Implicit**
 
@@ -95,10 +126,10 @@ in lab time and comoving-frame methods advancing in proper time.
 
 **Gordon-Hafizi**
 
-| Method | Class |
-|:---|:---|
-| Exact | `GordonExact` |
-| Quadratic | `GordonQuadratic` |
+| Method | Class (2nd order) | Class (4th order) |
+|:---|:---|:---|
+| Exact | `GordonExact` | `GordonExactOrderFour` |
+| Quadratic | `GordonQuadratic` | `GordonQuadraticOrderFour` |
 
 **Hairer-Lubich-Shi**
 
@@ -132,3 +163,4 @@ in lab time and comoving-frame methods advancing in proper time.
 - Gonzalez, O., 1996. Time integration and discrete Hamiltonian systems. *Journal of Nonlinear Science, 6*(5), pp.449-467.
 - Gordon, D.F. and Hafizi, B., 2021. Special unitary particle pusher for extreme fields. *Computer Physics Communications, 258*, p.107628.
 - Hairer, E., Lubich, C. and Shi, Y., 2023. Leapfrog methods for relativistic charged-particle dynamics. *SIAM Journal on Numerical Analysis, 61*(6), pp.2844-2858.
+- Yoshida, H., 1990. Construction of higher order symplectic integrators. *Physics Letters A, 150*(5-7), pp.262-268.

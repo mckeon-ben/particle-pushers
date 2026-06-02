@@ -11,7 +11,7 @@ a Hybrid Code. In Proc. Fourth Conf. Num. Sim. Plasmas (pp. 3-67).
 '''
 
 import numpy as np
-from ..pusher import Pusher
+from ..pusher import Pusher, PusherOrderFour
 from ..lorentz import lorentz_gamma
 
 
@@ -65,3 +65,15 @@ class Boris(Pusher):
 
     def advance(self, t_n, dt):
         return self._step(self.particle.x, self.particle.u, t_n, dt)
+
+
+class BorisOrderFour(PusherOrderFour, Boris):
+    '''
+    Fourth-order Boris pusher via Yoshida triple-jump composition.
+
+    Properties
+    ----------
+    - Fourth-order accurate in dt
+    - Volume-preserving in phase space (inherited from Boris)
+    '''
+    pass

@@ -15,7 +15,7 @@ electromagnetic fields. Physics of Plasmas, 24(5).
 '''
 
 import numpy as np
-from ..pusher import Pusher
+from ..pusher import Pusher, PusherOrderFour
 from ..lorentz import lorentz_gamma
 
 
@@ -89,3 +89,16 @@ class Higuera(Pusher):
 
     def advance(self, t_n, dt):
         return self._step(self.particle.x, self.particle.u, t_n, dt)
+
+
+class HigueraOrderFour(PusherOrderFour, Higuera):
+    '''
+    Fourth-order Higuera-Cary pusher via Yoshida triple-jump composition.
+
+    Properties
+    ----------
+    - Fourth-order accurate in dt
+    - Volume-preserving in phase space and correct E×B drift
+      (inherited from Higuera-Cary)
+    '''
+    pass

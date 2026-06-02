@@ -13,7 +13,7 @@ relativistic velocity. Physics of Plasmas, 15(5).
 '''
 
 import numpy as np
-from ..pusher import Pusher
+from ..pusher import Pusher, PusherOrderFour
 from ..lorentz import lorentz_gamma
 
 
@@ -85,3 +85,15 @@ class Vay(Pusher):
 
     def advance(self, t_n, dt):
         return self._step(self.particle.x, self.particle.u, t_n, dt)
+
+
+class VayOrderFour(PusherOrderFour, Vay):
+    '''
+    Fourth-order Vay pusher via Yoshida triple-jump composition.
+
+    Properties
+    ----------
+    - Fourth-order accurate in dt
+    - Correctly captures the E×B drift velocity (inherited from Vay)
+    '''
+    pass

@@ -1,6 +1,8 @@
 from .gordon import (
     GordonExact,
-    GordonQuadratic
+    GordonQuadratic,
+    GordonExactOrderFour,
+    GordonQuadraticOrderFour
 )
 from .hairer import (
     HairerExplicit,
@@ -11,6 +13,8 @@ from .hairer import (
 __all__ = [
     'GordonExact',
     'GordonQuadratic',
+    'GordonExactOrderFour',
+    'GordonQuadraticOrderFour',
     'HairerExplicit',
     'HairerDiscreteGradient',
     'HairerVariational'

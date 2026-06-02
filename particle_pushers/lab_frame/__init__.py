@@ -1,7 +1,16 @@
-from .boris import Boris
-from .vay import Vay
-from .higuera import Higuera
+from .boris import Boris, BorisOrderFour
+from .vay import Vay, VayOrderFour
+from .higuera import Higuera, HigueraOrderFour
 from .lapenta import Lapenta
 from .discrete_gradient import DiscreteGradient
 
-__all__ = ['Boris', 'Vay', 'Higuera', 'Lapenta', 'DiscreteGradient']
+__all__ = [
+    'Boris',
+    'BorisOrderFour',
+    'Vay',
+    'VayOrderFour',
+    'Higuera',
+    'HigueraOrderFour',
+    'Lapenta',
+    'DiscreteGradient'
+]
