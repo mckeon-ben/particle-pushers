@@ -45,7 +45,16 @@ interface of its second-order counterpart and takes the same 3-vector
 particle; only the class name changes.
 
 ```python
-from particle_pushers import BorisOrderFour
+import numpy as np
+from particle_pushers import BorisOrderFour, StaticField, Particle
+
+field = StaticField(B_func=lambda x: np.array([0., 0., 1.]))
+
+particle = Particle(
+    x=np.array([1., 0., 0.]),
+    u=np.array([0., 0.5, 0.]),
+    q=1., m=1.
+)
 
 sim = BorisOrderFour(particle, field)
 t, x, u = sim.solve((0., 20 * np.pi), N=1000)
@@ -87,7 +96,19 @@ of its second-order counterpart and takes the same 4-vector particle; only
 the class name changes.
 
 ```python
-from particle_pushers import GordonExactOrderFour
+import numpy as np
+from particle_pushers import GordonExactOrderFour, StaticField, Particle
+from particle_pushers import lorentz_gamma
+
+field = StaticField(B_func=lambda x: np.array([0., 0., 1.]))
+
+x3 = np.array([1., 0., 0.])
+u3 = np.array([0., 0.5, 0.])
+
+x0 = np.array([0., x3[0], x3[1], x3[2]])
+u0 = np.array([lorentz_gamma(u3), u3[0], u3[1], u3[2]])
+
+particle = Particle(x=x0, u=u0, q=1., m=1.)
 
 sim = GordonExactOrderFour(particle, field)
 tau, x, u = sim.solve((0., 20 * np.pi), N=1000)
