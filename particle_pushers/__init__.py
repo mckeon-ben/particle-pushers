@@ -32,29 +32,33 @@ Lab-frame pushers
 -----------------
 Boris
     Boris leapfrog method.
-BorisOrderFour
-    Fourth-order Boris method via Yoshida composition.
 Vay
     Vay leapfrog method.
-VayOrderFour
-    Fourth-order Vay method via Yoshida composition.
 Higuera
     Higuera-Cary leapfrog method.
-HigueraOrderFour
-    Fourth-order Higuera-Cary method via Yoshida composition.
 Lapenta
     Lapenta-Markidis implicit method.
 DiscreteGradient
     Discrete gradient implicit method with exact energy conservation.
+BorisOrderFour
+    Fourth-order Boris method via Yoshida composition.
+VayOrderFour
+    Fourth-order Vay method via Yoshida composition.
+HigueraOrderFour
+    Fourth-order Higuera-Cary method via Yoshida composition.
 
 Comoving-frame pushers
 ----------------------
 GordonExact
     Gordon-Hafizi exact unitary method.
-GordonExactOrderFour
-    Fourth-order Gordon-Hafizi exact method via Yoshida composition.
 GordonQuadratic
     Gordon-Hafizi quadratic unitary method.
+GordonExactLab
+    Gordon-Hafizi exact unitary method with lab-time conversion.
+GordonQuadraticLab
+    Gordon-Hafizi quadratic unitary method with lab-time conversion.
+GordonExactOrderFour
+    Fourth-order Gordon-Hafizi exact method via Yoshida composition.
 GordonQuadraticOrderFour
     Fourth-order Gordon-Hafizi quadratic method via Yoshida composition.
 HairerExplicit
@@ -69,13 +73,13 @@ from .field import Field, StaticField, TimeDependentField, SuperposedField
 from .particle import Particle
 from .lorentz import lorentz_gamma
 from .lab_frame import (
-    Boris, BorisOrderFour,
-    Vay, VayOrderFour,
-    Higuera, HigueraOrderFour,
-    Lapenta, DiscreteGradient,
+    Boris, Vay, Higuera, Lapenta, DiscreteGradient,
+    BorisOrderFour, VayOrderFour, HigueraOrderFour
 )
 from .comoving_frame import (
-    GordonExact, GordonExactOrderFour,
-    GordonQuadratic, GordonQuadraticOrderFour,
+    GordonExact, GordonQuadratic,
+    GordonExactLab, GordonQuadraticLab,
+    GordonExactOrderFour, GordonQuadraticOrderFour,
+    GordonExactLabOrderFour, GordonQuadraticLabOrderFour,
     HairerExplicit, HairerDiscreteGradient, HairerVariational
 )

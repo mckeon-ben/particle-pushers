@@ -204,7 +204,7 @@ class StaticField(Field):
         return np.asarray(self._B(x), dtype=float) if self._B is not None else super().B(x, t)
 
     def phi(self, x, t=None):
-        return np.asarray(self._phi(x), dtype=float) if self._phi is not None else super().phi(x, t)
+        return float(self._phi(x)) if self._phi is not None else super().phi(x, t)
 
     def A(self, x, t=None):
         return np.asarray(self._A(x), dtype=float) if self._A is not None else super().A(x, t)
@@ -268,25 +268,25 @@ class TimeDependentField(Field):
         self._A_t = A_t_func
         self._A_x = A_x_func
 
-    def E(self, x, t):
+    def E(self, x, t=None):
         return np.asarray(self._E(x, t), dtype=float) if self._E is not None else super().E(x, t)
 
-    def B(self, x, t):
+    def B(self, x, t=None):
         return np.asarray(self._B(x, t), dtype=float) if self._B is not None else super().B(x, t)
 
-    def phi(self, x, t):
-        return np.asarray(self._phi(x, t), dtype=float) if self._phi is not None else super().phi(x, t)
+    def phi(self, x, t=None):
+        return float(self._phi(x, t)) if self._phi is not None else super().phi(x, t)
 
-    def A(self, x, t):
+    def A(self, x, t=None):
         return np.asarray(self._A(x, t), dtype=float) if self._A is not None else super().A(x, t)
 
-    def phi_t(self, x, t):
-        return np.asarray(self._phi_t(x, t), dtype=float) if self._phi_t is not None else super().phi_t(x, t)
+    def phi_t(self, x, t=None):
+        return float(self._phi_t(x, t)) if self._phi_t is not None else super().phi_t(x, t)
 
-    def A_t(self, x, t):
+    def A_t(self, x, t=None):
         return np.asarray(self._A_t(x, t), dtype=float) if self._A_t is not None else super().A_t(x, t)
 
-    def A_x(self, x, t):
+    def A_x(self, x, t=None):
         return np.asarray(self._A_x(x, t), dtype=float) if self._A_x is not None else super().A_x(x, t)
 
 
@@ -296,7 +296,8 @@ class SuperposedField(Field):
 
     Combines any number of Field objects by summing their contributions.
     Useful for representing a background field combined with a
-    perturbation, or multiple wave modes simultaneously.
+    perturbation, or multiple wave modes simultaneously. With no
+    constituent fields, every quantity reduces to the zero default.
 
     Parameters
     ----------
@@ -322,23 +323,23 @@ class SuperposedField(Field):
             raise TypeError('all arguments must be Field instances')
         self.fields = fields
 
-    def E(self, x, t):
-        return sum(f.E(x, t) for f in self.fields)
+    def E(self, x, t=None):
+        return sum((f.E(x, t) for f in self.fields), np.zeros(3))
 
-    def B(self, x, t):
-        return sum(f.B(x, t) for f in self.fields)
+    def B(self, x, t=None):
+        return sum((f.B(x, t) for f in self.fields), np.zeros(3))
 
-    def phi(self, x, t):
-        return sum(f.phi(x, t) for f in self.fields)
+    def phi(self, x, t=None):
+        return sum((f.phi(x, t) for f in self.fields), 0.0)
 
-    def A(self, x, t):
-        return sum(f.A(x, t) for f in self.fields)
+    def A(self, x, t=None):
+        return sum((f.A(x, t) for f in self.fields), np.zeros(3))
 
-    def phi_t(self, x, t):
-        return sum(f.phi_t(x, t) for f in self.fields)
+    def phi_t(self, x, t=None):
+        return sum((f.phi_t(x, t) for f in self.fields), 0.0)
 
-    def A_t(self, x, t):
-        return sum(f.A_t(x, t) for f in self.fields)
+    def A_t(self, x, t=None):
+        return sum((f.A_t(x, t) for f in self.fields), np.zeros(3))
 
-    def A_x(self, x, t):
-        return sum(f.A_x(x, t) for f in self.fields)
+    def A_x(self, x, t=None):
+        return sum((f.A_x(x, t) for f in self.fields), np.zeros((3, 3)))

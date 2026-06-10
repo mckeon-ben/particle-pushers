@@ -21,6 +21,7 @@ Analysis, 61(6), pp.2844-2858.
 import warnings
 import numpy as np
 from abc import abstractmethod
+from scipy.linalg import lu_factor, lu_solve
 from scipy.optimize import fixed_point
 from ..pusher import Pusher
 from ..field import TimeDependentField
@@ -34,18 +35,18 @@ _M_INV = np.diag((-1., 1., 1., 1.))
 class Hairer(Pusher):
     '''
     Abstract base class for Hairer-Lubich-Shi comoving-frame pushers.
-
+ 
     Provides the staggered leapfrog integration loop, electromagnetic
-    field tensor construction, Cayley transform, and stagger operator
-    shared by all Hairer methods. The system is autonomous in proper
-    time; lab time is extracted directly from the zeroth component of
-    the 4-position vector.
-
+    field tensor construction, Cayley transform application, and stagger
+    operator shared by all Hairer methods. The system is autonomous in
+    proper time; lab time is extracted directly from the zeroth component
+    of the 4-position vector.
+ 
     Positions are stored at integer proper time steps and velocities
     at half-integer proper time steps. The stagger operator initialises
     the scheme by advancing the velocity by half a time step and the
     position by a full time step before the main iteration begins.
-
+ 
     Subclasses must implement _step().
     '''
 
@@ -176,26 +177,30 @@ class Hairer(Pusher):
 
         return t, x_out, u_out
 
-    def _cayley(self, A):
+    def _cayley_apply(self, A, u):
         '''
-        Cayley transform of a matrix.
+        Apply the Cayley transform of a matrix to a vector.
 
-        Computes the Cayley transform (I - A)^{-1}(I + A), which maps
-        elements of a quadratic Lie algebra to the corresponding Lie
-        group. Used to construct the velocity update operator for all
+        Returns the action of the Cayley transform (I - A)^{-1}(I + A)
+        on the vector u, obtained by solving the linear system
+        (I - A) w = (I + A) u. The Cayley transform maps elements of a
+        quadratic Lie algebra to the corresponding Lie group; it is
+        used to construct the velocity update operator for all
         Hairer-Lubich-Shi leapfrog methods.
 
         Parameters
         ----------
         A : np.ndarray
             Input matrix, shape (4, 4).
+        u : np.ndarray
+            Vector to transform, shape (4,).
 
         Returns
         -------
         np.ndarray
-            Cayley transform of A, shape (4, 4).
+            Cayley transform of A applied to u, shape (4,).
         '''
-        return np.linalg.inv(np.eye(4) - A) @ (np.eye(4) + A)
+        return np.linalg.solve(np.eye(4) - A, (np.eye(4) + A) @ u)
 
     @abstractmethod
     def _step(self, x, u, dt):
@@ -264,7 +269,7 @@ class HairerExplicit(Hairer):
             Updated 4-velocity at the next half-integer step, shape (4,).
         '''
         F = self._compute_F_tensor(x[1:], x[0])
-        u_new = self._cayley(_M_INV @ F * self.q_over_m * dt / 2) @ u
+        u_new = self._cayley_apply(_M_INV @ F * self.q_over_m * dt / 2, u)
         x_new = x + u_new * dt
         return x_new, u_new
 
@@ -364,7 +369,7 @@ class HairerDiscreteGradient(Hairer):
             x_next_half = x + u_k * (dt / 2)
             E_bar = self._compute_E_bar(x_next_half, x_prev_half)
             F_bar = self._compute_F_tensor(x[1:], x[0], E=E_bar)
-            return self._cayley(_M_INV @ F_bar * self.q_over_m * dt / 2) @ u
+            return self._cayley_apply(_M_INV @ F_bar * self.q_over_m * dt / 2, u)
 
         try:
             u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)
@@ -401,9 +406,9 @@ class HairerVariational(Hairer):
         Construct the Jacobian of the 4-potential with respect to the
         4-position.
 
-        Assembles the 4×4 matrix partial_mu A_nu from the
-        electric field, partial time derivatives and spatial Jacobian
-        of the vector potential.
+        Assembles the 4×4 matrix partial_mu A_nu from the electric
+        field, partial time derivatives and spatial Jacobian of
+        the vector potential.
 
         Parameters
         ----------
@@ -473,9 +478,9 @@ class HairerVariational(Hairer):
         A_prev = self.field.A(x_prev[1:], x_prev[0])
         A4_prev = np.hstack((-phi_prev, A_prev))
 
-        # Precompute iteration-invariant matrix factors.
-        cayley_F_mod = self._cayley(_M_INV @ F_mod * self.q_over_m * dt / 2)
-        inv_F_mod = np.linalg.inv(np.eye(4) - _M_INV @ F_mod * self.q_over_m * dt / 2)
+        cay_arg = _M_INV @ F_mod * self.q_over_m * dt / 2
+        lu_fac = lu_factor(np.eye(4) - cay_arg)
+        num_fac = np.eye(4) + cay_arg
 
         def iteration(u_k):
             x_next = x + u_k * dt
@@ -483,8 +488,7 @@ class HairerVariational(Hairer):
             A_next = self.field.A(x_next[1:], x_next[0])
             A4_next = np.hstack((-phi_next, A_next))
             A_bar = (A4_next - A4_prev) / 2
-            return (cayley_F_mod @ u
-                    - inv_F_mod @ _M_INV @ A_bar)
+            return lu_solve(lu_fac, num_fac @ u_k - _M_INV @ A_bar)
 
         try:
             u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)

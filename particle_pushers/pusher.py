@@ -161,54 +161,69 @@ class Pusher(ABC):
 class PusherOrderFour(Pusher):
     '''
     Frame-agnostic Yoshida triple-jump fourth-order composition.
-
+ 
     Lifts a symmetric second-order pusher to fourth-order accuracy by applying
     its base step three times with coefficients (w1, w0, w1), where the central
     coefficient w0 is negative (a backward sub-step), chosen so that the leading
-    third-order error term of the symmetric base step cancels.
-
+    third-order error term of the symmetric base step cancels. The composition
+    is fourth-order provided the base step is time-symmetric, which holds for
+    the explicit lab-frame methods (Boris, Vay, Higuera-Cary) and the
+    Gordon-Hafizi methods (GordonExact, GordonQuadratic), so a single base
+    serves both frames.
+ 
     This class provides the composed advance() only. The single-step method
     _step() is supplied by a concrete pusher mixed in by the subclass, listed
     after this class so that its _step() resolves via the method resolution
     order while this advance() takes precedence, e.g.
     ``class BorisOrderFour(PusherOrderFour, Boris)``.
-
+ 
     The two frames differ only in the _step() signature, selected by the
     _lab_time class attribute:
-
+ 
       * lab-frame (_lab_time = True, the default), _step(x, u, t_n, dt): lab
         time is explicit and is threaded across sub-steps by the cumulative
         fractional step, so time-dependent fields are sampled correctly;
       * comoving-frame (_lab_time = False), _step(x, u, dt): lab time rides in
         the zeroth component of the 4-position and needs no threading, so a
         comoving subclass must set ``_lab_time = False``.
-
+ 
     Notes
     -----
     The sub-step state is threaded directly through the three composition
     stages rather than through self.particle, which the solve() loop writes
     back only once per full step. Routing it through self.particle instead
     would make all three stages start from the same point rather than compose.
-
+ 
     References
     ----------
     Yoshida, H., 1990. Construction of higher order symplectic
     integrators. Physics Letters A, 150(5-7), pp.262-268.
     '''
-
+ 
     w1 = 1 / (2 - 2**(1/3))
     w0 = -2**(1/3) / (2 - 2**(1/3))
     coeffs = [w1, w0, w1]
-
+ 
     _lab_time = True
-
+ 
+    def _substep(self, x, u, t_n, dt):
+        '''Single composition sub-step.
+ 
+        Defaults to the concrete pusher's ``_step``, dispatching on the
+        ``_lab_time`` signature. Subclasses may override to route the Yoshida
+        composition through a wrapped step (for example, a lab-time conversion
+        that solves for the proper-time increment realising each weighted
+        lab-time sub-step). The ``t_n`` argument is accepted for signature
+        uniformity and ignored by comoving-frame steps.
+        '''
+        if self._lab_time:
+            return self._step(x, u, t_n, dt)
+        return self._step(x, u, dt)
+ 
     def advance(self, t_n, dt):
         x, u = self.particle.x, self.particle.u
         t = t_n
         for c in self.coeffs:
-            if self._lab_time:
-                x, u = self._step(x, u, t, c * dt)
-            else:
-                x, u = self._step(x, u, c * dt)
+            x, u = self._substep(x, u, t, c * dt)
             t += c * dt
         return x, u
