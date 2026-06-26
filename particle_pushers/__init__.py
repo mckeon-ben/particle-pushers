@@ -61,6 +61,14 @@ GordonExactOrderFour
     Fourth-order Gordon-Hafizi exact method via Yoshida composition.
 GordonQuadraticOrderFour
     Fourth-order Gordon-Hafizi quadratic method via Yoshida composition.
+GordonExactLabOrderFour
+    Fourth-order Gordon-Hafizi exact method with lab-time conversion.
+GordonQuadraticLabOrderFour
+    Fourth-order Gordon-Hafizi quadratic method with lab-time conversion.
+GordonExactStaggered
+    Gordon-Hafizi exact unitary method with staggered (kick-drift) leapfrog.
+GordonQuadraticStaggered
+    Gordon-Hafizi quadratic unitary method with staggered (kick-drift) leapfrog.
 HairerExplicit
     Hairer-Lubich-Shi explicit leapfrog method.
 HairerDiscreteGradient
@@ -81,5 +89,6 @@ from .comoving_frame import (
     GordonExactLab, GordonQuadraticLab,
     GordonExactOrderFour, GordonQuadraticOrderFour,
     GordonExactLabOrderFour, GordonQuadraticLabOrderFour,
+    GordonExactStaggered, GordonQuadraticStaggered,
     HairerExplicit, HairerDiscreteGradient, HairerVariational
 )

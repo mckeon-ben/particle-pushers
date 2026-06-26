@@ -488,7 +488,7 @@ class HairerVariational(Hairer):
             A_next = self.field.A(x_next[1:], x_next[0])
             A4_next = np.hstack((-phi_next, A_next))
             A_bar = (A4_next - A4_prev) / 2
-            return lu_solve(lu_fac, num_fac @ u_k - _M_INV @ A_bar)
+            return lu_solve(lu_fac, num_fac @ u - _M_INV @ A_bar)
 
         try:
             u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)
