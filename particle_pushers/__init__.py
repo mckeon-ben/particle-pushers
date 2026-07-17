@@ -1,5 +1,6 @@
 '''
-particle_pushers: relativistic charged particle pushers for electromagnetic field simulation.
+particle_pushers: relativistic charged particle pushers for
+electromagnetic field simulation.
 
 A Python package implementing various explicit and implicit numerical
 integrators for tracking relativistic charged test particles in static
@@ -18,8 +19,6 @@ StaticField
     Electromagnetic field with no explicit time dependence.
 TimeDependentField
     Electromagnetic field with explicit time dependence.
-SuperposedField
-    Superposition of multiple electromagnetic fields.
 Particle
     Relativistic charged test particle.
 
@@ -68,7 +67,8 @@ GordonQuadraticLabOrderFour
 GordonExactStaggered
     Gordon-Hafizi exact unitary method with staggered (kick-drift) leapfrog.
 GordonQuadraticStaggered
-    Gordon-Hafizi quadratic unitary method with staggered (kick-drift) leapfrog.
+    Gordon-Hafizi quadratic unitary method with staggered
+    (kick-drift) leapfrog.
 HairerExplicit
     Hairer-Lubich-Shi explicit leapfrog method.
 HairerDiscreteGradient
@@ -77,7 +77,7 @@ HairerVariational
     Hairer-Lubich-Shi variational leapfrog method.
 '''
 
-from .field import Field, StaticField, TimeDependentField, SuperposedField
+from .field import Field, StaticField, TimeDependentField
 from .particle import Particle
 from .lorentz import lorentz_gamma
 from .lab_frame import (
@@ -92,3 +92,32 @@ from .comoving_frame import (
     GordonExactStaggered, GordonQuadraticStaggered,
     HairerExplicit, HairerDiscreteGradient, HairerVariational
 )
+
+__all__ = [
+    'Field',
+    'StaticField',
+    'TimeDependentField',
+    'Particle',
+    'lorentz_gamma',
+    'Boris',
+    'Vay',
+    'Higuera',
+    'Lapenta',
+    'DiscreteGradient',
+    'BorisOrderFour',
+    'VayOrderFour',
+    'HigueraOrderFour',
+    'GordonExact',
+    'GordonQuadratic',
+    'GordonExactLab',
+    'GordonQuadraticLab',
+    'GordonExactOrderFour',
+    'GordonQuadraticOrderFour',
+    'GordonExactLabOrderFour',
+    'GordonQuadraticLabOrderFour',
+    'GordonExactStaggered',
+    'GordonQuadraticStaggered',
+    'HairerExplicit',
+    'HairerDiscreteGradient',
+    'HairerVariational',
+]

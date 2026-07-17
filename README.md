@@ -1,6 +1,9 @@
 # particle-pushers
 
-A Python package implementing a suite of numerical integrators for tracking relativistic charged test particles in static and time-dependent electromagnetic fields. All quantities are in natural units where *c* = 1.
+A Python package implementing a suite of numerical integrators for
+tracking relativistic charged test particles in static and
+time-dependent electromagnetic fields. All quantities are in natural
+units where *c* = 1.
 
 ## Requirements
 
@@ -123,34 +126,34 @@ via Yoshida triple-jump composition.
 
 ### Lab frame
 
-**Explicit**
+#### Explicit
 
 | Method | Class (2nd order) | Class (4th order) |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | Boris | `Boris` | `BorisOrderFour` |
 | Vay | `Vay` | `VayOrderFour` |
 | Higuera-Cary | `Higuera` | `HigueraOrderFour` |
 
-**Implicit**
+#### Implicit
 
 | Method | Class |
-|:---|:---|
+| :--- | :--- |
 | Lapenta-Markidis | `Lapenta` |
 | Discrete gradient | `DiscreteGradient` |
 
 ### Comoving frame
 
-**Gordon-Hafizi**
+#### Gordon-Hafizi
 
 | Method | Class (2nd order) | Class (4th order) |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | Exact | `GordonExact` | `GordonExactOrderFour` |
 | Quadratic | `GordonQuadratic` | `GordonQuadraticOrderFour` |
 
-**Hairer-Lubich-Shi**
+#### Hairer-Lubich-Shi
 
 | Method | Class |
-|:---|:---|
+| :--- | :--- |
 | Explicit | `HairerExplicit` |
 | Discrete gradient | `HairerDiscreteGradient` |
 | Variational | `HairerVariational` |
@@ -158,25 +161,35 @@ via Yoshida triple-jump composition.
 ## Field Classes
 
 | Class | Description |
-|:---|:---|
+| :--- | :--- |
 | `StaticField` | Position-dependent fields with no time dependence |
 | `TimeDependentField` | Fields depending on both position and time |
-| `SuperposedField` | Sum of multiple field objects |
 
 ## Utilities
 
 | Name | Description |
-|:---|:---|
+| :--- | :--- |
 | `Particle` | Relativistic charged test particle |
 | `lorentz_gamma` | Lorentz factor *γ* for a relativistic velocity vector |
 
 ## References
 
-- Boris, J.P., 1970. Relativistic Plasma Simulation — Optimization of a Hybrid Code. In *Proc. Fourth Conf. Num. Sim. Plasmas* (pp. 3-67).
-- Vay, J.L., 2008. Simulation of beams or plasmas crossing at relativistic velocity. *Physics of Plasmas, 15*(5).
-- Higuera, A.V. and Cary, J.R., 2017. Structure-preserving second-order integration of relativistic charged particle trajectories in electromagnetic fields. *Physics of Plasmas, 24*(5).
-- Lapenta, G. and Markidis, S., 2011. Particle acceleration and energy conservation in particle in cell simulations. *Physics of Plasmas, 18*(7).
-- Gonzalez, O., 1996. Time integration and discrete Hamiltonian systems. *Journal of Nonlinear Science, 6*(5), pp.449-467.
-- Gordon, D.F. and Hafizi, B., 2021. Special unitary particle pusher for extreme fields. *Computer Physics Communications, 258*, p.107628.
-- Hairer, E., Lubich, C. and Shi, Y., 2023. Leapfrog methods for relativistic charged-particle dynamics. *SIAM Journal on Numerical Analysis, 61*(6), pp.2844-2858.
-- Yoshida, H., 1990. Construction of higher order symplectic integrators. *Physics Letters A, 150*(5-7), pp.262-268.
+- Boris, J.P., 1970. Relativistic Plasma Simulation — Optimization of a
+  Hybrid Code. In *Proc. Fourth Conf. Num. Sim. Plasmas* (pp. 3-67).
+- Vay, J.L., 2008. Simulation of beams or plasmas crossing at
+  relativistic velocity. *Physics of Plasmas, 15*(5).
+- Higuera, A.V. and Cary, J.R., 2017. Structure-preserving second-order
+  integration of relativistic charged particle trajectories in
+  electromagnetic fields. *Physics of Plasmas, 24*(5).
+- Lapenta, G. and Markidis, S., 2011. Particle acceleration and energy
+  conservation in particle in cell simulations. *Physics of Plasmas,
+  18*(7).
+- Gonzalez, O., 1996. Time integration and discrete Hamiltonian systems.
+  *Journal of Nonlinear Science, 6*(5), pp.449-467.
+- Gordon, D.F. and Hafizi, B., 2021. Special unitary particle pusher for
+  extreme fields. *Computer Physics Communications, 258*, p.107628.
+- Hairer, E., Lubich, C. and Shi, Y., 2023. Leapfrog methods for
+  relativistic charged-particle dynamics. *SIAM Journal on Numerical
+  Analysis, 61*(6), pp.2844-2858.
+- Yoshida, H., 1990. Construction of higher order symplectic
+  integrators. *Physics Letters A, 150*(5-7), pp.262-268.

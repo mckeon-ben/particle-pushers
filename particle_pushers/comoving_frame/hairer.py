@@ -35,18 +35,18 @@ _M_INV = np.diag((-1., 1., 1., 1.))
 class Hairer(Pusher):
     '''
     Abstract base class for Hairer-Lubich-Shi comoving-frame pushers.
- 
+
     Provides the staggered leapfrog integration loop, electromagnetic
     field tensor construction, Cayley transform application, and stagger
     operator shared by all Hairer methods. The system is autonomous in
     proper time; lab time is extracted directly from the zeroth component
     of the 4-position vector.
- 
+
     Positions are stored at integer proper time steps and velocities
     at half-integer proper time steps. The stagger operator initialises
     the scheme by advancing the velocity by half a time step and the
     position by a full time step before the main iteration begins.
- 
+
     Subclasses must implement _step().
     '''
 
@@ -152,9 +152,12 @@ class Hairer(Pusher):
         try:
             t_start, t_end = t_span
         except (TypeError, ValueError):
-            raise ValueError(f't_span must be a two-element sequence, got {t_span!r}')
+            raise ValueError(
+                f't_span must be a two-element sequence, got {t_span!r}')
         if t_start >= t_end:
-            raise ValueError(f't_span must satisfy t_start < t_end, got ({t_start}, {t_end})')
+            raise ValueError(
+                f't_span must satisfy t_start < t_end, '
+                f'got ({t_start}, {t_end})')
 
         dt = (t_end - t_start) / N
         t = np.linspace(t_start, t_end, N + 1)
@@ -297,7 +300,8 @@ class HairerDiscreteGradient(Hairer):
     def solve(self, t_span, N):
         if isinstance(self.field, TimeDependentField):
             warnings.warn(
-                'Energy conservation is not guaranteed in time-dependent fields!',
+                'Energy conservation is not guaranteed in '
+                'time-dependent fields!',
                 UserWarning,
                 stacklevel=2
             )
@@ -332,8 +336,8 @@ class HairerDiscreteGradient(Hairer):
             return self.field.E(x1[1:], x1[0])
         phi1 = self.field.phi(x1[1:], x1[0])
         phi2 = self.field.phi(x2[1:], x2[0])
-        return E_bar_val - ((phi2 - phi1 + np.dot(E_bar_val, delta_x))
-                / norm_delta_x**2) * delta_x
+        coeff = (phi2 - phi1 + np.dot(E_bar_val, delta_x)) / norm_delta_x**2
+        return E_bar_val - coeff * delta_x
 
     def _step(self, x, u, dt):
         '''
@@ -369,12 +373,15 @@ class HairerDiscreteGradient(Hairer):
             x_next_half = x + u_k * (dt / 2)
             E_bar = self._compute_E_bar(x_next_half, x_prev_half)
             F_bar = self._compute_F_tensor(x[1:], x[0], E=E_bar)
-            return self._cayley_apply(_M_INV @ F_bar * self.q_over_m * dt / 2, u)
+            return self._cayley_apply(
+                _M_INV @ F_bar * self.q_over_m * dt / 2, u)
 
         try:
             u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)
         except RuntimeError as e:
-            raise RuntimeError(f"Hairer-Lubich-Shi discrete gradient solver failed to converge: {e}") from e
+            raise RuntimeError(
+                "Hairer-Lubich-Shi discrete gradient solver failed to "
+                f"converge: {e}") from e
 
         x_new = x + u_new * dt
         return x_new, u_new
@@ -493,7 +500,9 @@ class HairerVariational(Hairer):
         try:
             u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)
         except RuntimeError as e:
-            raise RuntimeError(f"Hairer-Lubich-Shi variational solver failed to converge: {e}") from e
+            raise RuntimeError(
+                "Hairer-Lubich-Shi variational solver failed to "
+                f"converge: {e}") from e
 
         x_new = x + u_new * dt
         return x_new, u_new

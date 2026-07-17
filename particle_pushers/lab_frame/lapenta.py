@@ -19,7 +19,8 @@ from ..lorentz import lorentz_gamma
 
 class Lapenta(Pusher):
     '''
-    Lapenta-Markidis implicit pusher for relativistic charged particle tracking.
+    Lapenta-Markidis implicit pusher for relativistic charged
+    particle tracking.
 
     A fully implicit second-order method in which the velocity update
     is obtained by fixed-point iteration at each time step. The field
@@ -91,7 +92,9 @@ class Lapenta(Pusher):
         try:
             u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)
         except RuntimeError as e:
-            raise RuntimeError(f"Lapenta-Markidis solver failed to converge: {e}") from e
+            raise RuntimeError(
+                f"Lapenta-Markidis solver failed to converge: {e}"
+            ) from e
 
         # Position update using average of old and new velocities.
         gamma_new = lorentz_gamma(u_new)

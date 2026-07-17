@@ -24,7 +24,8 @@ from ..lorentz import lorentz_gamma
 
 class DiscreteGradient(Pusher):
     '''
-    Discrete gradient implicit pusher for relativistic charged particle tracking.
+    Discrete gradient implicit pusher for relativistic charged
+    particle tracking.
 
     A fully implicit second-order method that guarantees exact
     single-particle energy conservation for static fields. The standard
@@ -53,7 +54,8 @@ class DiscreteGradient(Pusher):
     def solve(self, t_span, N):
         if isinstance(self.field, TimeDependentField):
             warnings.warn(
-                'Energy conservation is not guaranteed in time-dependent fields!',
+                'Energy conservation is not guaranteed in '
+                'time-dependent fields!',
                 UserWarning,
                 stacklevel=2
             )
@@ -97,8 +99,8 @@ class DiscreteGradient(Pusher):
         E_bar_val = self.field.E(x_bar, t_mid)
         phi1 = self.field.phi(x1, t_mid)
         phi2 = self.field.phi(x2, t_mid)
-        return ((phi1 - phi2 - np.dot(E_bar_val, delta_x))
-                / norm_delta_x**2) * delta_x + E_bar_val
+        coeff = (phi2 - phi1 + np.dot(E_bar_val, delta_x)) / norm_delta_x**2
+        return E_bar_val - coeff * delta_x
 
     def advance(self, t_n, dt):
         '''
@@ -144,7 +146,9 @@ class DiscreteGradient(Pusher):
         try:
             u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)
         except RuntimeError as e:
-            raise RuntimeError(f"Discrete gradient solver failed to converge: {e}") from e
+            raise RuntimeError(
+                f"Discrete gradient solver failed to converge: {e}"
+            ) from e
 
         # Position update using average of old and new velocities.
         gamma_new = lorentz_gamma(u_new)

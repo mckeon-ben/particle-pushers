@@ -179,7 +179,8 @@ class Gordon(Pusher):
         return x_new, u_new
 
     def advance(self, t_n, dt):
-        # Proper-time step here; LabTimeConversion overrides advance for lab time.
+        # Proper-time step here; LabTimeConversion overrides advance
+        # for lab time.
         return self._step(self.particle.x, self.particle.u, dt)
 
 
@@ -222,8 +223,9 @@ class GordonExact(Gordon):
         '''
         if field_invariant == 0:
             field_invariant += np.finfo(float).eps
-        return (np.cosh(field_invariant * dtau) * np.eye(2)
-                + np.sinh(field_invariant * dtau) * (F / field_invariant))
+        cosh_term = np.cosh(field_invariant * dtau) * np.eye(2)
+        sinh_term = np.sinh(field_invariant * dtau) * (F / field_invariant)
+        return cosh_term + sinh_term
 
 
 class GordonQuadratic(Gordon):
@@ -369,7 +371,8 @@ class LabTimeConversion:
             ``conversion_max_iter`` iterations.
         '''
         gamma_n = u[0]
-        # Leading-order guess dtau = dt_lab / gamma_n, then iterate to converge.
+        # Leading-order guess dtau = dt_lab / gamma_n, then iterate
+        # to converge.
         dtau = dt_lab / gamma_n
         x_new, u_new = self._step(x, u, dtau)
         for _ in range(self.conversion_max_iter):
@@ -406,7 +409,8 @@ class GordonExactLab(LabTimeConversion, GordonExact):
 
 class GordonQuadraticLab(LabTimeConversion, GordonQuadratic):
     '''
-    Lab-time-stepped Gordon-Hafizi pusher with quadratic time evolution operator.
+    Lab-time-stepped Gordon-Hafizi pusher with quadratic time
+    evolution operator.
 
     Combines the symmetric lab-time conversion with the Pade-type operator
     from GordonQuadratic. Takes controlled lab-time steps for direct
@@ -511,7 +515,7 @@ class GordonQuadraticLabOrderFour(PusherOrderFour, GordonQuadraticLab):
 class GordonStaggered(Gordon):
     '''
     Abstract base for staggered Gordon-Hafizi comoving-frame pushers.
- 
+
     A variant of the Gordon-Hafizi method that replaces the co-located
     drift-kick-drift (DKD) step of the base ``Gordon`` class with the
     staggered kick-drift (KD) leapfrog convention used by the
@@ -519,7 +523,7 @@ class GordonStaggered(Gordon):
     time steps and velocities at half-integer proper time steps. A
     single stagger operator advances the velocity by a half step and the
     position by a full step before the main iteration begins.
- 
+
     The velocity kick is still performed by the spinor sandwich
     ``U -> T U T^dagger`` with the concrete time evolution operator T
     supplied by a subclass via ``_compute_time_operator`` (inherited from
@@ -527,12 +531,12 @@ class GordonStaggered(Gordon):
     field is sampled at the integer node ``x_n`` rather than at the DKD
     midpoint, so this is a genuinely different one-step map from the base
     ``Gordon`` method, with a different leading error coefficient.
- 
+
     Unlike the Hairer ``_stagger``, no explicit reset of ``u_new[0]`` is
     required: the spinor sandwich preserves the determinant (and hence
     the mass shell u^mu u_mu = -1) by construction for the exact operator,
     and preserves unit determinant for the quadratic operator.
- 
+
     Notes
     -----
     The bare kick-drift ``_step`` is **not** time-symmetric on its own, so
@@ -542,18 +546,18 @@ class GordonStaggered(Gordon):
     fourth-order variants. Similarly, the ``LabTimeConversion`` mixin
     assumes position and velocity are co-located at the same node and is
     not applied here.
- 
+
     Subclasses obtain ``_compute_time_operator`` from an operator mixin.
     '''
- 
+
     def _stagger(self, x, u, dtau):
         '''
         Stagger the position and velocity by half a proper time step.
- 
+
         Advances the 4-velocity by a half proper time step via the spinor
         sandwich and the 4-position by a full proper time step with the
         staggered velocity, initialising the staggered leapfrog scheme.
- 
+
         Parameters
         ----------
         x : np.ndarray
@@ -562,7 +566,7 @@ class GordonStaggered(Gordon):
             Initial 4-velocity, shape (4,).
         dtau : float
             Proper time step.
- 
+
         Returns
         -------
         x_new : np.ndarray
@@ -577,19 +581,19 @@ class GordonStaggered(Gordon):
         U = _vector_to_spinor(u)
         U_new = time_op @ U @ time_op_dagger
         u_new = _spinor_to_vector(U_new)
- 
+
         # Full drift with the staggered (half-integer) velocity.
         x_new = x + u_new * dtau
         return x_new, u_new
- 
+
     def _step(self, x, u, dtau):
         '''
         Perform a single staggered Gordon-Hafizi kick-drift step.
- 
+
         Applies a full velocity kick via the spinor sandwich, with the
         field sampled at the current integer 4-position, then drifts the
         position by a full step using the updated half-integer velocity.
- 
+
         Parameters
         ----------
         x : np.ndarray
@@ -598,7 +602,7 @@ class GordonStaggered(Gordon):
             Current 4-velocity at half-integer step, shape (4,).
         dtau : float
             Proper time step.
- 
+
         Returns
         -------
         x_new : np.ndarray
@@ -613,29 +617,29 @@ class GordonStaggered(Gordon):
         U = _vector_to_spinor(u)
         U_new = time_op @ U @ time_op_dagger
         u_new = _spinor_to_vector(U_new)
- 
+
         # Full drift with the updated half-integer velocity.
         x_new = x + u_new * dtau
         return x_new, u_new
- 
+
     def solve(self, t_span, N):
         '''
         Integrate the equations of motion over a given proper time
         interval.
- 
+
         Uses a staggered leapfrog scheme in which positions are stored at
         integer proper time steps and velocities at half-integer proper
         time steps. The stagger operator is applied once before the main
         iteration begins. Mirrors ``Hairer.solve``: ``x_out`` has shape
         (N + 1, n_dims) and ``u_out`` has shape (N, n_dims).
- 
+
         Parameters
         ----------
         t_span : tuple of float
             Integration interval (t_start, t_end) in proper time.
         N : int
             Number of proper time steps.
- 
+
         Returns
         -------
         t : np.ndarray
@@ -644,7 +648,7 @@ class GordonStaggered(Gordon):
             4-position array at integer steps, shape (N + 1, 4).
         u_out : np.ndarray
             4-velocity array at half-integer steps, shape (N, 4).
- 
+
         Raises
         ------
         TypeError
@@ -660,66 +664,69 @@ class GordonStaggered(Gordon):
         try:
             t_start, t_end = t_span
         except (TypeError, ValueError):
-            raise ValueError(f't_span must be a two-element sequence, got {t_span!r}')
+            raise ValueError(
+                f't_span must be a two-element sequence, got {t_span!r}')
         if t_start >= t_end:
-            raise ValueError(f't_span must satisfy t_start < t_end, got ({t_start}, {t_end})')
- 
+            raise ValueError(
+                f't_span must satisfy t_start < t_end, '
+                f'got ({t_start}, {t_end})')
+
         dtau = (t_end - t_start) / N
         t = np.linspace(t_start, t_end, N + 1)
- 
+
         n_dims = self.particle.x.size
         x_out = np.zeros((N + 1, n_dims))
         u_out = np.zeros((N, n_dims))
         x_out[0] = self.particle.x
- 
+
         x_out[1], u_out[0] = self._stagger(
             self.particle.x, self.particle.u, dtau
         )
         self.particle.x = x_out[1]
         self.particle.u = u_out[0]
- 
+
         for n in range(1, N):
             x_out[n + 1], u_out[n] = self.advance(t[n], dtau)
             self.particle.x = x_out[n + 1]
             self.particle.u = u_out[n]
- 
+
         return t, x_out, u_out
- 
- 
+
+
 class GordonExactStaggered(GordonStaggered, GordonExact):
     '''
     Staggered Gordon-Hafizi pusher with exact time evolution operator.
- 
+
     Combines the staggered kick-drift leapfrog convention with the exact
     hyperbolic time evolution operator from ``GordonExact``. Positions are
     stored at integer proper time steps and velocities at half-integer
     proper time steps, matching the Hairer-Lubich-Shi stagger convention.
- 
+
     Properties
     ----------
     - Second-order accurate in proper time step dtau
     - Velocity operator exact in uniform fields (integer-node-frozen
       otherwise)
     - Preserves the mass shell u^mu u_mu = -1 to machine precision
- 
+
     Notes
     -----
     The ``_compute_time_operator`` resolves to ``GordonExact`` via the
     method resolution order, while the staggered ``_stagger``, ``_step``,
     and ``solve`` resolve to ``GordonStaggered``.
     '''
- 
- 
+
+
 class GordonQuadraticStaggered(GordonStaggered, GordonQuadratic):
     '''
     Staggered Gordon-Hafizi pusher with quadratic time evolution operator.
- 
+
     Combines the staggered kick-drift leapfrog convention with the
     Pade-type approximate time evolution operator from ``GordonQuadratic``.
     Positions are stored at integer proper time steps and velocities at
     half-integer proper time steps, matching the Hairer-Lubich-Shi stagger
     convention.
- 
+
     Properties
     ----------
     - Second-order accurate in proper time step dtau

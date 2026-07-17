@@ -1,22 +1,22 @@
 [build-system]
 requires = ["setuptools>=64", "wheel"]
-build-backend = 'setuptools.build_meta'
+build-backend = "setuptools.build_meta"
 
 [project]
-name = 'particle-pushers'
-version = '0.2.0'
+name = "particle-pushers"
+version = "0.2.0"
 dependencies = [
-  'numpy',
-  'scipy'
+  "numpy",
+  "scipy",
 ]
-requires-python = '>=3.9'
+requires-python = ">=3.9"
 authors = [
-  {name = 'Ben McKeon', email = 'mckeon.ben@ul.ie'}
+  { name = "Ben McKeon", email = "mckeon.ben@ul.ie" },
 ]
-description = 'A suite of numerical integrators for relativistic charged particle tracking.'
-readme = 'README.md'
-license = 'MIT'
-license-files = ['LICENSE.*']
+description = "A suite of relativistic charged-particle integrators."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE.*"]
 
 [project.urls]
-Repository = 'https://github.com/mckeon-ben/particle-pushers'
+Repository = "https://github.com/mckeon-ben/particle-pushers"

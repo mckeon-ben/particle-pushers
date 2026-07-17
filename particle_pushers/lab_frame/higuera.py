@@ -59,7 +59,8 @@ class Higuera(Pusher):
             Updated particle relativistic 3-velocity, shape (3,).
         '''
         x_mid = x + u / lorentz_gamma(u) * (dt / 2)
-        E, B = self.field.E(x_mid, t_n + dt / 2), self.field.B(x_mid, t_n + dt / 2)
+        t_mid = t_n + dt / 2
+        E, B = self.field.E(x_mid, t_mid), self.field.B(x_mid, t_mid)
 
         # First velocity update before rotation in B-field.
         u_minus = u + E * self.q_over_m * (dt / 2)
@@ -72,14 +73,16 @@ class Higuera(Pusher):
         sigma = gamma_minus**2 - tau_sq
 
         # Lorentz gamma factor after rotation in B-field.
-        gamma_plus = np.sqrt((sigma + np.sqrt(sigma**2 + 4 * (tau_sq + u_star**2))) / 2)
+        gamma_plus = np.sqrt(
+            (sigma + np.sqrt(sigma**2 + 4 * (tau_sq + u_star**2))) / 2)
 
         # Scaling B-field for second velocity update.
         t_vec = tau / gamma_plus
         s = 1 / (1 + np.dot(t_vec, t_vec))
 
         # Intermediate velocity after rotation in B-field.
-        u_plus = s * (u_minus + np.dot(u_minus, t_vec) * t_vec + np.cross(u_minus, t_vec))
+        u_rot = u_minus + np.dot(u_minus, t_vec) * t_vec
+        u_plus = s * (u_rot + np.cross(u_minus, t_vec))
 
         # Second velocity update after rotation in B-field.
         u_new = u_plus + E * self.q_over_m * (dt / 2) + np.cross(u_plus, t_vec)

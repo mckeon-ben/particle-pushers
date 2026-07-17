@@ -1,11 +1,11 @@
 '''
 Electromagnetic field classes for relativistic charged particle tracking.
 
-Provides a base Field class and concrete implementations for static,
-time-dependent, and superposed electromagnetic fields. Fields are
-defined in terms of the electric and magnetic field vectors, scalar
-and vector potentials, and their derivatives. All quantities are
-assumed to be in natural units where c = 1.
+Provides a base Field class and concrete implementations for static
+and time-dependent electromagnetic fields. Fields are defined in terms
+of the electric and magnetic field vectors, scalar and vector
+potentials, and their derivatives. All quantities are assumed to be in
+natural units where c = 1.
 '''
 
 import numpy as np
@@ -176,7 +176,8 @@ class StaticField(Field):
     phi_func : callable, optional
         Scalar potential function with signature phi(x) -> float.
     A_func : callable, optional
-        Vector potential function with signature A(x) -> array_like, shape (3,).
+        Vector potential function with signature
+        A(x) -> array_like, shape (3,).
     A_x_func : callable, optional
         Spatial Jacobian of the vector potential with signature
         A_x(x) -> array_like, shape (3, 3).
@@ -198,16 +199,20 @@ class StaticField(Field):
         self._A_x = A_x_func
 
     def E(self, x, t=None):
-        return np.asarray(self._E(x), dtype=float) if self._E is not None else super().E(x, t)
+        return (np.asarray(self._E(x), dtype=float)
+                if self._E is not None else super().E(x, t))
 
     def B(self, x, t=None):
-        return np.asarray(self._B(x), dtype=float) if self._B is not None else super().B(x, t)
+        return (np.asarray(self._B(x), dtype=float)
+                if self._B is not None else super().B(x, t))
 
     def phi(self, x, t=None):
-        return float(self._phi(x)) if self._phi is not None else super().phi(x, t)
+        return (float(self._phi(x))
+                if self._phi is not None else super().phi(x, t))
 
     def A(self, x, t=None):
-        return np.asarray(self._A(x), dtype=float) if self._A is not None else super().A(x, t)
+        return (np.asarray(self._A(x), dtype=float)
+                if self._A is not None else super().A(x, t))
 
     def phi_t(self, x, t=None):
         return super().phi_t(x, t)
@@ -216,7 +221,8 @@ class StaticField(Field):
         return super().A_t(x, t)
 
     def A_x(self, x, t=None):
-        return np.asarray(self._A_x(x), dtype=float) if self._A_x is not None else super().A_x(x, t)
+        return (np.asarray(self._A_x(x), dtype=float)
+                if self._A_x is not None else super().A_x(x, t))
 
 
 class TimeDependentField(Field):
@@ -230,13 +236,16 @@ class TimeDependentField(Field):
     Parameters
     ----------
     E_func : callable, optional
-        Electric field function with signature E(x, t) -> array_like, shape (3,).
+        Electric field function with signature
+        E(x, t) -> array_like, shape (3,).
     B_func : callable, optional
-        Magnetic field function with signature B(x, t) -> array_like, shape (3,).
+        Magnetic field function with signature
+        B(x, t) -> array_like, shape (3,).
     phi_func : callable, optional
         Scalar potential function with signature phi(x, t) -> float.
     A_func : callable, optional
-        Vector potential function with signature A(x, t) -> array_like, shape (3,).
+        Vector potential function with signature
+        A(x, t) -> array_like, shape (3,).
     phi_t_func : callable, optional
         Partial time derivative of the scalar potential with signature
         phi_t(x, t) -> float.
@@ -269,77 +278,29 @@ class TimeDependentField(Field):
         self._A_x = A_x_func
 
     def E(self, x, t=None):
-        return np.asarray(self._E(x, t), dtype=float) if self._E is not None else super().E(x, t)
+        return (np.asarray(self._E(x, t), dtype=float)
+                if self._E is not None else super().E(x, t))
 
     def B(self, x, t=None):
-        return np.asarray(self._B(x, t), dtype=float) if self._B is not None else super().B(x, t)
+        return (np.asarray(self._B(x, t), dtype=float)
+                if self._B is not None else super().B(x, t))
 
     def phi(self, x, t=None):
-        return float(self._phi(x, t)) if self._phi is not None else super().phi(x, t)
+        return (float(self._phi(x, t))
+                if self._phi is not None else super().phi(x, t))
 
     def A(self, x, t=None):
-        return np.asarray(self._A(x, t), dtype=float) if self._A is not None else super().A(x, t)
+        return (np.asarray(self._A(x, t), dtype=float)
+                if self._A is not None else super().A(x, t))
 
     def phi_t(self, x, t=None):
-        return float(self._phi_t(x, t)) if self._phi_t is not None else super().phi_t(x, t)
+        return (float(self._phi_t(x, t))
+                if self._phi_t is not None else super().phi_t(x, t))
 
     def A_t(self, x, t=None):
-        return np.asarray(self._A_t(x, t), dtype=float) if self._A_t is not None else super().A_t(x, t)
+        return (np.asarray(self._A_t(x, t), dtype=float)
+                if self._A_t is not None else super().A_t(x, t))
 
     def A_x(self, x, t=None):
-        return np.asarray(self._A_x(x, t), dtype=float) if self._A_x is not None else super().A_x(x, t)
-
-
-class SuperposedField(Field):
-    '''
-    Superposition of multiple electromagnetic fields.
-
-    Combines any number of Field objects by summing their contributions.
-    Useful for representing a background field combined with a
-    perturbation, or multiple wave modes simultaneously. With no
-    constituent fields, every quantity reduces to the zero default.
-
-    Parameters
-    ----------
-    *fields : Field
-        Any number of Field objects to superpose.
-
-    Raises
-    ------
-    TypeError
-        If any argument is not a Field instance.
-
-    Examples
-    --------
-    Background magnetic field plus a plane wave:
-
-    >>> background = StaticField(B_func=lambda x: [0., 0., 1.])
-    >>> wave = TimeDependentField(E_func=E_func, B_func=B_func)
-    >>> field = SuperposedField(background, wave)
-    '''
-
-    def __init__(self, *fields):
-        if not all(isinstance(f, Field) for f in fields):
-            raise TypeError('all arguments must be Field instances')
-        self.fields = fields
-
-    def E(self, x, t=None):
-        return sum((f.E(x, t) for f in self.fields), np.zeros(3))
-
-    def B(self, x, t=None):
-        return sum((f.B(x, t) for f in self.fields), np.zeros(3))
-
-    def phi(self, x, t=None):
-        return sum((f.phi(x, t) for f in self.fields), 0.0)
-
-    def A(self, x, t=None):
-        return sum((f.A(x, t) for f in self.fields), np.zeros(3))
-
-    def phi_t(self, x, t=None):
-        return sum((f.phi_t(x, t) for f in self.fields), 0.0)
-
-    def A_t(self, x, t=None):
-        return sum((f.A_t(x, t) for f in self.fields), np.zeros(3))
-
-    def A_x(self, x, t=None):
-        return sum((f.A_x(x, t) for f in self.fields), np.zeros((3, 3)))
+        return (np.asarray(self._A_x(x, t), dtype=float)
+                if self._A_x is not None else super().A_x(x, t))

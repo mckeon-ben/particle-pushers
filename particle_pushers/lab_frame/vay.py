@@ -57,10 +57,12 @@ class Vay(Pusher):
             Updated particle relativistic 3-velocity, shape (3,).
         '''
         x_mid = x + u / lorentz_gamma(u) * (dt / 2)
-        E, B = self.field.E(x_mid, t_n + dt / 2), self.field.B(x_mid, t_n + dt / 2)
+        t_mid = t_n + dt / 2
+        E, B = self.field.E(x_mid, t_mid), self.field.B(x_mid, t_mid)
 
         # First velocity update before rotation in B-field.
-        u_half = u + (E + np.cross(u / lorentz_gamma(u), B)) * self.q_over_m * (dt / 2)
+        force = E + np.cross(u / lorentz_gamma(u), B)
+        u_half = u + force * self.q_over_m * (dt / 2)
 
         # Rotating the velocity vector in B-field.
         tau = B * self.q_over_m * (dt / 2)
@@ -71,14 +73,16 @@ class Vay(Pusher):
         sigma = gamma_prime**2 - tau_sq
 
         # Lorentz gamma factor after rotation in B-field.
-        gamma_new = np.sqrt((sigma + np.sqrt(sigma**2 + 4 * (tau_sq + u_star**2))) / 2)
+        gamma_new = np.sqrt(
+            (sigma + np.sqrt(sigma**2 + 4 * (tau_sq + u_star**2))) / 2)
 
         # Scaling B-field for second velocity update.
         t_vec = tau / gamma_new
         s = 1 / (1 + np.dot(t_vec, t_vec))
 
         # Second velocity update after rotation in B-field.
-        u_new = s * (u_prime + np.dot(u_prime, t_vec) * t_vec + np.cross(u_prime, t_vec))
+        u_rot = u_prime + np.dot(u_prime, t_vec) * t_vec
+        u_new = s * (u_rot + np.cross(u_prime, t_vec))
 
         x_new = x_mid + u_new / lorentz_gamma(u_new) * (dt / 2)
         return x_new, u_new

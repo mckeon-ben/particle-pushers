@@ -54,7 +54,8 @@ class Boris(Pusher):
             Updated particle relativistic 3-velocity, shape (3,).
         '''
         x_mid = x + u / lorentz_gamma(u) * (dt / 2)
-        E, B = self.field.E(x_mid, t_n + dt / 2), self.field.B(x_mid, t_n + dt / 2)
+        t_mid = t_n + dt / 2
+        E, B = self.field.E(x_mid, t_mid), self.field.B(x_mid, t_mid)
         u_minus = u + E * self.q_over_m * (dt / 2)
         t_vec = (B / lorentz_gamma(u_minus)) * self.q_over_m * (dt / 2)
         s = (2 * t_vec) / (1 + np.dot(t_vec, t_vec))
