@@ -268,7 +268,8 @@ class TimeDependentField(Field):
     '''
 
     def __init__(self, E_func=None, B_func=None, phi_func=None,
-                 A_func=None, phi_t_func=None, A_t_func=None, A_x_func=None):
+                 A_func=None, phi_t_func=None, A_t_func=None,
+                 A_x_func=None):
         self._E = E_func
         self._B = B_func
         self._phi = phi_func

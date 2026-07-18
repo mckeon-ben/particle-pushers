@@ -45,6 +45,8 @@ VayOrderFour
     Fourth-order Vay method via Yoshida composition.
 HigueraOrderFour
     Fourth-order Higuera-Cary method via Yoshida composition.
+LargeStepExplicit
+    Large-stepsize modified Boris method for guiding-centre motion.
 
 Comoving-frame pushers
 ----------------------
@@ -64,11 +66,6 @@ GordonExactLabOrderFour
     Fourth-order Gordon-Hafizi exact method with lab-time conversion.
 GordonQuadraticLabOrderFour
     Fourth-order Gordon-Hafizi quadratic method with lab-time conversion.
-GordonExactStaggered
-    Gordon-Hafizi exact unitary method with staggered (kick-drift) leapfrog.
-GordonQuadraticStaggered
-    Gordon-Hafizi quadratic unitary method with staggered
-    (kick-drift) leapfrog.
 HairerExplicit
     Hairer-Lubich-Shi explicit leapfrog method.
 HairerDiscreteGradient
@@ -82,14 +79,14 @@ from .particle import Particle
 from .lorentz import lorentz_gamma
 from .lab_frame import (
     Boris, Vay, Higuera, Lapenta, DiscreteGradient,
-    BorisOrderFour, VayOrderFour, HigueraOrderFour
+    BorisOrderFour, VayOrderFour, HigueraOrderFour,
+    LargeStepExplicit
 )
 from .comoving_frame import (
     GordonExact, GordonQuadratic,
     GordonExactLab, GordonQuadraticLab,
     GordonExactOrderFour, GordonQuadraticOrderFour,
     GordonExactLabOrderFour, GordonQuadraticLabOrderFour,
-    GordonExactStaggered, GordonQuadraticStaggered,
     HairerExplicit, HairerDiscreteGradient, HairerVariational
 )
 
@@ -107,6 +104,7 @@ __all__ = [
     'BorisOrderFour',
     'VayOrderFour',
     'HigueraOrderFour',
+    'LargeStepExplicit',
     'GordonExact',
     'GordonQuadratic',
     'GordonExactLab',
@@ -115,9 +113,7 @@ __all__ = [
     'GordonQuadraticOrderFour',
     'GordonExactLabOrderFour',
     'GordonQuadraticLabOrderFour',
-    'GordonExactStaggered',
-    'GordonQuadraticStaggered',
     'HairerExplicit',
     'HairerDiscreteGradient',
-    'HairerVariational',
+    'HairerVariational'
 ]

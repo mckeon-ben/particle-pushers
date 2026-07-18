@@ -123,8 +123,8 @@ class Pusher(ABC):
             pushers.
         u_out : np.ndarray
             Particle velocity array, shape (N + 1, n_dims). For
-            comoving-frame pushers with a staggered leapfrog scheme,
-            u_out has shape (N, n_dims) instead.
+            pushers with a staggered leapfrog scheme, u_out has
+            shape (N, n_dims) instead.
 
         Raises
         ------
