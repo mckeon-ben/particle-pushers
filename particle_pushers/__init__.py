@@ -45,8 +45,6 @@ VayOrderFour
     Fourth-order Vay method via Yoshida composition.
 HigueraOrderFour
     Fourth-order Higuera-Cary method via Yoshida composition.
-LargeStepExplicit
-    Large-stepsize modified Boris method for guiding-centre motion.
 
 Comoving-frame pushers
 ----------------------
@@ -79,8 +77,7 @@ from .particle import Particle
 from .lorentz import lorentz_gamma
 from .lab_frame import (
     Boris, Vay, Higuera, Lapenta, DiscreteGradient,
-    BorisOrderFour, VayOrderFour, HigueraOrderFour,
-    LargeStepExplicit
+    BorisOrderFour, VayOrderFour, HigueraOrderFour
 )
 from .comoving_frame import (
     GordonExact, GordonQuadratic,
@@ -104,7 +101,6 @@ __all__ = [
     'BorisOrderFour',
     'VayOrderFour',
     'HigueraOrderFour',
-    'LargeStepExplicit',
     'GordonExact',
     'GordonQuadratic',
     'GordonExactLab',

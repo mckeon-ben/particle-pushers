@@ -3,7 +3,6 @@ from .vay import Vay, VayOrderFour
 from .higuera import Higuera, HigueraOrderFour
 from .lapenta import Lapenta
 from .discrete_gradient import DiscreteGradient
-from .large_step import LargeStepExplicit
 
 __all__ = [
     'Boris',
@@ -13,6 +12,5 @@ __all__ = [
     'Higuera',
     'HigueraOrderFour',
     'Lapenta',
-    'DiscreteGradient',
-    'LargeStepExplicit'
+    'DiscreteGradient'
 ]
