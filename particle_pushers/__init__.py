@@ -14,7 +14,7 @@ composition.
 Classes
 -------
 Field
-    Abstract base class for electromagnetic fields.
+    Base class for electromagnetic fields; the zero field.
 StaticField
     Electromagnetic field with no explicit time dependence.
 TimeDependentField

@@ -23,19 +23,19 @@ def lorentz_gamma(u):
 
     Returns
     -------
-    float
+    np.float64
         Lorentz gamma factor corresponding to velocity u.
 
     Examples
     --------
     Particle at rest:
 
-    >>> lorentz_gamma([0., 0., 0.])
+    >>> float(lorentz_gamma([0., 0., 0.]))
     1.0
 
     Highly relativistic particle:
 
-    >>> lorentz_gamma([1., 0., 0.])
+    >>> float(lorentz_gamma([1., 0., 0.]))
     1.4142135623730951
     '''
     u = np.asarray(u)

@@ -13,7 +13,7 @@ import numpy as np
 
 class Field:
     '''
-    Abstract base class for electromagnetic fields.
+    Base class for electromagnetic fields.
 
     Defines the interface for all field classes. All methods return
     zero by default, allowing subclasses to override only the
@@ -22,6 +22,13 @@ class Field:
 
     All spatial quantities are 3-vectors and all temporal quantities
     are scalars unless otherwise stated.
+
+    Notes
+    -----
+    This class is concrete and may be instantiated directly, in which
+    case it represents an identically zero electromagnetic field. It
+    is not an abstract base class: it declares no abstract methods and
+    subclasses are free to override any subset of its methods.
     '''
 
     def E(self, x, t=None) -> np.ndarray:

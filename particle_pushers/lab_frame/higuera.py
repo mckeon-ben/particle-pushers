@@ -29,8 +29,8 @@ class Higuera(Pusher):
     the half-accelerated momentum, combining the structure-preserving
     property of Boris with the correct drift behaviour of Vay.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Second-order accurate in dt
     - Volume-preserving in phase space
     - Correctly captures the E×B drift velocity
@@ -98,8 +98,8 @@ class HigueraOrderFour(PusherOrderFour, Higuera):
     '''
     Fourth-order Higuera-Cary pusher via Yoshida triple-jump composition.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Fourth-order accurate in dt
     - Volume-preserving in phase space and correct E×B drift
       (inherited from Higuera-Cary)

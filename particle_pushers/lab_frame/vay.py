@@ -27,8 +27,8 @@ class Vay(Pusher):
     Lorentz factor after the combined electric and magnetic field
     update.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Second-order accurate in dt
     - Correctly captures the E×B drift velocity
     - Not volume-preserving in general
@@ -95,8 +95,8 @@ class VayOrderFour(PusherOrderFour, Vay):
     '''
     Fourth-order Vay pusher via Yoshida triple-jump composition.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Fourth-order accurate in dt
     - Correctly captures the E×B drift velocity (inherited from Vay)
     '''

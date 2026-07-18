@@ -27,9 +27,11 @@ from ..pusher import Pusher
 from ..field import TimeDependentField
 
 
-# Inverse Minkowski metric tensor. Since M = diag(-1,1,1,1), it is
-# its own inverse.
 _M_INV = np.diag((-1., 1., 1., 1.))
+'''Inverse Minkowski metric tensor.
+
+Since M = diag(-1, 1, 1, 1), the metric is its own inverse.
+'''
 
 
 class Hairer(Pusher):
@@ -229,9 +231,31 @@ class Hairer(Pusher):
             Updated 4-velocity at the next half-integer step, shape (4,).
         '''
 
-    def advance(self, _t_n, dt):
-        # Lab time is carried in the zeroth component of the 4-position
-        # x[0] and advanced automatically by _step.
+    def advance(self, t_n, dt):
+        '''
+        Advance the particle state by one proper time step.
+
+        The system is autonomous in proper time, so ``dt`` is
+        interpreted as a proper time increment and ``t_n`` is unused;
+        lab time is carried in the zeroth component of the 4-position
+        and advances automatically within ``_step``.
+
+        Parameters
+        ----------
+        t_n : float
+            Current lab time. Accepted for interface uniformity with
+            the lab-frame pushers and ignored here.
+        dt : float
+            Proper time step.
+
+        Returns
+        -------
+        x_new : np.ndarray
+            Updated 4-position at the next integer step, shape (4,).
+        u_new : np.ndarray
+            Updated 4-velocity at the next half-integer step,
+            shape (4,).
+        '''
         return self._step(self.particle.x, self.particle.u, dt)
 
 
@@ -244,8 +268,8 @@ class HairerExplicit(Hairer):
     4-position. The position is updated using the new half-integer
     4-velocity.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Second-order accurate in proper time step dt
     - Preserves the mass shell condition u^mu u_mu = -1 exactly
     - Volume-preserving in phase space
@@ -286,8 +310,8 @@ class HairerDiscreteGradient(Hairer):
     conservation for static fields. The velocity update is obtained
     implicitly via fixed-point iteration at each step.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Second-order accurate in proper time step dt
     - Exactly conserves the Hamiltonian H = gamma*m + q*phi for static fields
     - Preserves the mass shell condition u^mu u_mu = -1 exactly
@@ -298,6 +322,21 @@ class HairerDiscreteGradient(Hairer):
     '''
 
     def solve(self, t_span, N):
+        '''
+        Integrate the equations of motion over a given proper time
+        interval.
+
+        Identical to :meth:`Hairer.solve`, except that a UserWarning is
+        emitted first if the field is time-dependent, since the
+        discrete gradient energy conservation identity holds only for
+        static fields. See :meth:`Hairer.solve` for parameters,
+        returns and raised exceptions.
+
+        Warns
+        -----
+        UserWarning
+            If the field is a TimeDependentField instance.
+        '''
         if isinstance(self.field, TimeDependentField):
             warnings.warn(
                 'Energy conservation is not guaranteed in '
@@ -314,7 +353,9 @@ class HairerDiscreteGradient(Hairer):
         Constructs the discrete gradient of the scalar potential,
         which ensures the work done by the electric field between
         x1 and x2 exactly equals the potential energy difference
-        phi(x1) - phi(x2).
+        phi(x1) - phi(x2):
+
+            E_bar*(x2 - x1) = phi(x1) - phi(x2)
 
         Parameters
         ----------
@@ -327,6 +368,17 @@ class HairerDiscreteGradient(Hairer):
         -------
         np.ndarray
             Discrete gradient modified electric field, shape (3,).
+
+        Notes
+        -----
+        The spatial separation is taken from components 1 to 3 of the
+        4-positions; the field and potential are sampled at the lab
+        time carried in component 0. When x1 and x2 coincide to within
+        machine precision the discrete gradient is singular, and the
+        field at x1 is returned instead.
+
+        Note the argument order: the later position x2 precedes the
+        earlier position x1.
         '''
         x_bar = (x1 + x2) / 2
         delta_x = x2[1:] - x1[1:]
@@ -400,8 +452,8 @@ class HairerVariational(Hairer):
     The velocity update is obtained implicitly via fixed-point
     iteration at each step.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Second-order accurate in proper time step dt
     - Preserves the mass shell condition u^mu u_mu = -1 up to O(dt^2)
     - Conserves the Hamiltonian H up to O(dt^2)

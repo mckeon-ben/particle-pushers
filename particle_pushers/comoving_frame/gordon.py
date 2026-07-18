@@ -179,8 +179,31 @@ class Gordon(Pusher):
         return x_new, u_new
 
     def advance(self, t_n, dt):
-        # Proper-time step here; LabTimeConversion overrides advance
-        # for lab time.
+        '''
+        Advance the particle state by one proper time step.
+
+        The system is autonomous in proper time, so ``dt`` is
+        interpreted as a proper time increment and ``t_n`` is unused;
+        lab time is carried in the zeroth component of the 4-position
+        and advances automatically. Subclasses mixing in
+        LabTimeConversion override this method to take controlled
+        lab-time steps instead.
+
+        Parameters
+        ----------
+        t_n : float
+            Current lab time. Accepted for interface uniformity with
+            the lab-frame pushers and ignored here.
+        dt : float
+            Proper time step.
+
+        Returns
+        -------
+        x_new : np.ndarray
+            Updated 4-position, shape (4,).
+        u_new : np.ndarray
+            Updated 4-velocity, shape (4,).
+        '''
         return self._step(self.particle.x, self.particle.u, dt)
 
 
@@ -192,15 +215,11 @@ class GordonExact(Gordon):
     exponential using hyperbolic functions. This is the exact solution
     to the equations of motion in a locally constant field.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Second-order accurate in dt
     - Exact for uniform fields
 
-    References
-    ----------
-    Gordon, D.F. and Hafizi, B., 2021. Special unitary particle pusher
-    for extreme fields. Computer Physics Communications, 258, p.107628.
     '''
 
     def _compute_time_operator(self, F, field_invariant, dtau):
@@ -236,16 +255,12 @@ class GordonQuadratic(Gordon):
     approximation to the matrix exponential. The operator guarantees
     exact unit determinant preservation at every step.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Second-order accurate in dt
     - Unit determinant preserved by construction
     - Exact for null electromagnetic fields
 
-    References
-    ----------
-    Gordon, D.F. and Hafizi, B., 2021. Special unitary particle pusher
-    for extreme fields. Computer Physics Communications, 258, p.107628.
     '''
 
     def _compute_time_operator(self, F, field_invariant, dtau):
@@ -280,14 +295,12 @@ class GordonExactOrderFour(PusherOrderFour, GordonExact):
     uniform fields at each sub-step, so the only per-step error is the
     field-variation error, which the composition reduces to fourth order.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Fourth-order accurate in dt
     - Exact for uniform fields at each sub-step
     - Preserves unit determinant to machine precision
 
-    Notes
-    -----
     Because the exact operator is exact in a uniform field, the global error
     converges at fourth order down to round-off, making this the preferred
     choice when high accuracy is required.
@@ -388,6 +401,30 @@ class LabTimeConversion:
         )
 
     def advance(self, t_n, dt):
+        '''
+        Advance the particle state by one controlled lab time step.
+
+        Overrides the proper-time ``advance`` of the underlying Gordon
+        pusher, so that ``dt`` is a lab-time increment realised by
+        solving the trapezoidal conversion for the corresponding
+        proper-time step.
+
+        Parameters
+        ----------
+        t_n : float
+            Current lab time. Accepted for interface uniformity and
+            ignored; lab time is carried in the zeroth component of
+            the 4-position.
+        dt : float
+            Lab time step to realise.
+
+        Returns
+        -------
+        x_new : np.ndarray
+            Updated 4-position, shape (4,).
+        u_new : np.ndarray
+            Updated 4-velocity, shape (4,).
+        '''
         return self._lab_step(self.particle.x, self.particle.u, dt)
 
 
@@ -399,8 +436,8 @@ class GordonExactLab(LabTimeConversion, GordonExact):
     operator from GordonExact. Takes controlled lab-time steps, so it can be
     compared directly with native lab-frame pushers at a common dt.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Second-order accurate in lab-time dt
     - Velocity operator exact in uniform fields (midpoint-frozen otherwise)
     - Preserves unit determinant at each step
@@ -416,8 +453,8 @@ class GordonQuadraticLab(LabTimeConversion, GordonQuadratic):
     from GordonQuadratic. Takes controlled lab-time steps for direct
     comparison with native lab-frame pushers at a common dt.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Second-order accurate in lab-time dt
     - Unit determinant preserved by construction at each step
     '''
@@ -430,14 +467,12 @@ class GordonQuadraticOrderFour(PusherOrderFour, GordonQuadratic):
     Combines the Yoshida fourth-order composition with the Pade-type
     approximate time evolution operator from GordonQuadratic.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Fourth-order accurate in dt down to the accuracy floor of the quadratic
       operator
     - Unit determinant preserved by construction at each step
 
-    Notes
-    -----
     Unlike the exact operator, the quadratic operator is a rational (Pade)
     approximation and is not exact even in a uniform field. It carries an
     intrinsic per-step error that the composition cannot remove, so the global
@@ -467,13 +502,11 @@ class GordonExactLabOrderFour(PusherOrderFour, GordonExactLab):
     is directly comparable at a common dt with a fourth-order lab-frame
     composition (e.g. BorisOrderFour).
 
-    Properties
-    ----------
+    Notes
+    -----
     - Fourth-order accurate in lab-time dt
     - Preserves unit determinant at each sub-step
 
-    Notes
-    -----
     The base step (_lab_step) carries lab time in the zeroth component of the
     4-position, so _lab_time is set to False (no explicit time threading); the
     composition is redirected from _step to _lab_step via _substep.
@@ -481,6 +514,33 @@ class GordonExactLabOrderFour(PusherOrderFour, GordonExactLab):
     _lab_time = False
 
     def _substep(self, x, u, t_n, dt):
+        '''
+        Route the Yoshida composition through the lab-time conversion.
+
+        Overrides the default sub-step so that each weighted stage of
+        the triple jump solves its own symmetric lab-time conversion
+        via ``_lab_step``, rather than taking a raw proper-time
+        ``_step``.
+
+        Parameters
+        ----------
+        x : np.ndarray
+            4-position at the start of the sub-step, shape (4,).
+        u : np.ndarray
+            4-velocity at the start of the sub-step, shape (4,).
+        t_n : float
+            Current lab time. Accepted for signature uniformity with
+            the lab-frame composition and ignored here.
+        dt : float
+            Weighted lab time sub-step.
+
+        Returns
+        -------
+        x_new : np.ndarray
+            Updated 4-position, shape (4,).
+        u_new : np.ndarray
+            Updated 4-velocity, shape (4,).
+        '''
         return self._lab_step(x, u, dt)
 
 
@@ -495,13 +555,11 @@ class GordonQuadraticLabOrderFour(PusherOrderFour, GordonQuadraticLab):
     method, the composition converges at fourth order only until it reaches
     the accuracy floor set by the quadratic (Pade) operator.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Fourth-order accurate in lab-time dt down to the quadratic operator floor
     - Unit determinant preserved by construction at each sub-step
 
-    Notes
-    -----
     The base step (_lab_step) carries lab time in the zeroth component of the
     4-position, so _lab_time is set to False; the composition is redirected
     from _step to _lab_step via _substep.
@@ -509,4 +567,31 @@ class GordonQuadraticLabOrderFour(PusherOrderFour, GordonQuadraticLab):
     _lab_time = False
 
     def _substep(self, x, u, t_n, dt):
+        '''
+        Route the Yoshida composition through the lab-time conversion.
+
+        Overrides the default sub-step so that each weighted stage of
+        the triple jump solves its own symmetric lab-time conversion
+        via ``_lab_step``, rather than taking a raw proper-time
+        ``_step``.
+
+        Parameters
+        ----------
+        x : np.ndarray
+            4-position at the start of the sub-step, shape (4,).
+        u : np.ndarray
+            4-velocity at the start of the sub-step, shape (4,).
+        t_n : float
+            Current lab time. Accepted for signature uniformity with
+            the lab-frame composition and ignored here.
+        dt : float
+            Weighted lab time sub-step.
+
+        Returns
+        -------
+        x_new : np.ndarray
+            Updated 4-position, shape (4,).
+        u_new : np.ndarray
+            Updated 4-velocity, shape (4,).
+        '''
         return self._lab_step(x, u, dt)

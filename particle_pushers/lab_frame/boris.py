@@ -24,8 +24,8 @@ class Boris(Pusher):
     magnetic rotation via the Boris rotation operator. The position
     is updated using two symmetric half-steps.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Second-order accurate in dt
     - Volume-preserving in phase space
     - Correct E×B drift to leading order
@@ -72,8 +72,8 @@ class BorisOrderFour(PusherOrderFour, Boris):
     '''
     Fourth-order Boris pusher via Yoshida triple-jump composition.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Fourth-order accurate in dt
     - Volume-preserving in phase space (inherited from Boris)
     '''

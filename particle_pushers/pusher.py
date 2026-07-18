@@ -2,7 +2,14 @@
 Base class for relativistic charged particle pushers.
 
 Provides the common interface and integration loop shared by all
-pusher implementations. All quantities are in natural units where c = 1.
+pusher implementations, together with the frame-agnostic Yoshida
+triple-jump composition used to lift symmetric second-order methods to
+fourth order. All quantities are in natural units where c = 1.
+
+References
+----------
+Yoshida, H., 1990. Construction of higher order symplectic
+integrators. Physics Letters A, 150(5-7), pp.262-268.
 '''
 
 import numpy as np
@@ -84,9 +91,9 @@ class Pusher(ABC):
         Parameters
         ----------
         t_n : float
-            Current time at the start of the step.
+            Current lab time.
         dt : float
-            Time step size.
+            Time step.
 
         Returns
         -------
@@ -122,9 +129,8 @@ class Pusher(ABC):
             n_dims is 3 for lab-frame pushers or 4 for comoving-frame
             pushers.
         u_out : np.ndarray
-            Particle velocity array, shape (N + 1, n_dims). For
-            pushers with a staggered leapfrog scheme, u_out has
-            shape (N, n_dims) instead.
+            Particle velocity array at integer steps,
+            shape (N + 1, n_dims).
 
         Raises
         ------
@@ -133,6 +139,12 @@ class Pusher(ABC):
         ValueError
             If N is not positive, or if t_span does not contain exactly
             two elements with t_start < t_end.
+
+        Notes
+        -----
+        Subclasses that use a staggered leapfrog scheme override this
+        method and return velocities on a different grid; see the
+        overriding docstring for the shapes actually returned.
         '''
         if not isinstance(N, (int, np.integer)):
             raise TypeError(f'N must be an integer, got {type(N).__name__}')
@@ -201,11 +213,6 @@ class PusherOrderFour(Pusher):
     stages rather than through self.particle, which the solve() loop writes
     back only once per full step. Routing it through self.particle instead
     would make all three stages start from the same point rather than compose.
-
-    References
-    ----------
-    Yoshida, H., 1990. Construction of higher order symplectic
-    integrators. Physics Letters A, 150(5-7), pp.262-268.
     '''
 
     w1 = 1 / (2 - 2 ** (1 / 3))
@@ -229,6 +236,29 @@ class PusherOrderFour(Pusher):
         return self._step(x, u, dt)
 
     def advance(self, t_n, dt):
+        '''
+        Advance the particle state by one composed fourth-order step.
+
+        Applies the base sub-step three times with the Yoshida weights
+        (w1, w0, w1), threading the intermediate state directly between
+        stages rather than through self.particle. Lab time is advanced
+        by each weighted sub-step so that time-dependent fields are
+        sampled at the correct instant.
+
+        Parameters
+        ----------
+        t_n : float
+            Current lab time at the start of the step.
+        dt : float
+            Full time step, before Yoshida weighting.
+
+        Returns
+        -------
+        x_new : np.ndarray
+            Updated particle position.
+        u_new : np.ndarray
+            Updated particle velocity.
+        '''
         x, u = self.particle.x, self.particle.u
         t = t_n
         for c in self.coeffs:

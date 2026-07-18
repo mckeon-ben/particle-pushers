@@ -34,14 +34,12 @@ class Lapenta(Pusher):
     particle context used here, energy conservation is approximate
     rather than exact.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Second-order accurate in dt
     - Unconditionally stable for large time steps
     - Exactly energy-conserving in a fully coupled PIC scheme
 
-    Notes
-    -----
     Energy conservation is not guaranteed in the test particle context
     since the back-reaction of the particle on the fields is absent.
     Exact energy conservation requires the field solver, current

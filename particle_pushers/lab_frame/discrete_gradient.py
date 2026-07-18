@@ -37,8 +37,8 @@ class DiscreteGradient(Pusher):
     The velocity update is obtained by fixed-point iteration at each
     time step.
 
-    Properties
-    ----------
+    Notes
+    -----
     - Second-order accurate in dt
     - Exactly conserves the single-particle Hamiltonian H = gamma*m + q*phi
       for static fields
@@ -52,6 +52,20 @@ class DiscreteGradient(Pusher):
     '''
 
     def solve(self, t_span, N):
+        '''
+        Integrate the equations of motion over a given time interval.
+
+        Identical to :meth:`Pusher.solve`, except that a UserWarning is
+        emitted first if the field is time-dependent, since the
+        discrete gradient energy conservation identity holds only for
+        static fields. See :meth:`Pusher.solve` for parameters,
+        returns and raised exceptions.
+
+        Warns
+        -----
+        UserWarning
+            If the field is a TimeDependentField instance.
+        '''
         if isinstance(self.field, TimeDependentField):
             warnings.warn(
                 'Energy conservation is not guaranteed in '
@@ -79,16 +93,24 @@ class DiscreteGradient(Pusher):
         x1 : array_like
             Initial spatial position vector, shape (3,).
         t_n : float
-            Lab time at the start of the step.
+            Current lab time.
         dt : float
-            Time step. Used to compute the midpoint time t_mid = t_n + dt / 2,
-            at which the midpoint field quantities are evaluated, and t_n at
-            which the fallback field is evaluated when x1 and x2 coincide.
+            Time step.
 
         Returns
         -------
         np.ndarray
             Discrete gradient modified electric field, shape (3,).
+
+        Notes
+        -----
+        Midpoint field quantities are evaluated at t_mid = t_n + dt / 2.
+        When x1 and x2 coincide to within machine precision the discrete
+        gradient is singular, and the field at x1 evaluated at t_n is
+        returned instead.
+
+        Note the argument order: the final position x2 precedes the
+        initial position x1.
         '''
         t_mid = t_n + dt / 2
         x_bar = (x1 + x2) / 2
