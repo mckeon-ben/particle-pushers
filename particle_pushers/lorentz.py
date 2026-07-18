@@ -11,7 +11,7 @@ def lorentz_gamma(u):
     '''
     Lorentz gamma factor for a relativistic velocity vector.
 
-    In natural units where c = 1 the Lorentz factor is:
+    In natural units where c = 1 the Lorentz factor is::
 
         gamma = sqrt(1 + |u|^2)
 

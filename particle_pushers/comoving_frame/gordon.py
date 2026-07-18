@@ -323,7 +323,7 @@ class LabTimeConversion:
     so that ``solve((0, T), N)`` advances N equal lab-time steps and is
     directly comparable to the native lab-frame pushers (Boris, etc.).
 
-    The conversion is the symmetric trapezoidal relation
+    The conversion is the symmetric trapezoidal relation::
 
         dt_lab = dtau * (gamma_n + gamma_{n+1}) / 2,
 

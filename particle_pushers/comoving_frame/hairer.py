@@ -353,7 +353,7 @@ class HairerDiscreteGradient(Hairer):
         Constructs the discrete gradient of the scalar potential,
         which ensures the work done by the electric field between
         x1 and x2 exactly equals the potential energy difference
-        phi(x1) - phi(x2):
+        phi(x1) - phi(x2)::
 
             E_bar*(x2 - x1) = phi(x1) - phi(x2)
 
