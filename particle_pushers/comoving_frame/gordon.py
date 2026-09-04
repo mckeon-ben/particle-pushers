@@ -27,6 +27,26 @@ _PAULI = np.array([
 '''Pauli matrix array used for spinor conversions.'''
 
 
+def _sinhc(z):
+    '''
+    Evaluate sinh(z) / z, which is analytic at z = 0 where it is unity.
+
+    Parameters
+    ----------
+    z : complex
+        Argument, in general complex: imaginary for a purely magnetic
+        field, real for a purely electric one.
+
+    Returns
+    -------
+    complex
+        Value of sinh(z) / z.
+    '''
+    if abs(z) < 1e-4:
+        return 1.0 + z * z / 6.0 + z ** 4 / 120.0
+    return np.sinh(z) / z
+
+
 def _vector_to_spinor(a):
     '''
     Convert a 4-vector to its spinor representation.
@@ -240,11 +260,9 @@ class GordonExact(Gordon):
         np.ndarray
             Exact time evolution operator, shape (2, 2).
         '''
-        if field_invariant == 0:
-            field_invariant += np.finfo(float).eps
-        cosh_term = np.cosh(field_invariant * dtau) * np.eye(2)
-        sinh_term = np.sinh(field_invariant * dtau) * (F / field_invariant)
-        return cosh_term + sinh_term
+        sinh_over_omega = dtau * _sinhc(field_invariant * dtau)
+        return (np.cosh(field_invariant * dtau) * np.eye(2)
+                + sinh_over_omega * F)
 
 
 class GordonQuadratic(Gordon):
