@@ -99,7 +99,7 @@ order, use `GordonExactOrderFour` or `GordonExactLabOrderFour`.
 
 A `Particle` holds a position `x`, a velocity `u`, a charge `q` and a
 mass `m`. The velocity is the spatial part of the 4-velocity,
-`u = gamma v`, not `v` itself. Lab-frame pushers use 3-vectors;
+`u = gamma v`, not *v* itself. Lab-frame pushers use 3-vectors;
 comoving-frame pushers use 4-vectors, as in the quick start.
 `lorentz_gamma(u)` returns the Lorentz factor, `sqrt(1 + |u|^2)`.
 
@@ -276,14 +276,6 @@ MIT; see [LICENSE](LICENSE).
 
 - Boris, J.P., 1970. Relativistic Plasma Simulation — Optimization of a
   Hybrid Code. In *Proc. Fourth Conf. Num. Sim. Plasmas* (pp. 3-67).
-- Vay, J.L., 2008. Simulation of beams or plasmas crossing at
-  relativistic velocity. *Physics of Plasmas, 15*(5).
-- Higuera, A.V. and Cary, J.R., 2017. Structure-preserving second-order
-  integration of relativistic charged particle trajectories in
-  electromagnetic fields. *Physics of Plasmas, 24*(5).
-- Lapenta, G. and Markidis, S., 2011. Particle acceleration and energy
-  conservation in particle in cell simulations. *Physics of Plasmas,
-  18*(7).
 - Gonzalez, O., 1996. Time integration and discrete Hamiltonian systems.
   *Journal of Nonlinear Science, 6*(5), pp.449-467.
 - Gordon, D.F. and Hafizi, B., 2021. Special unitary particle pusher for
@@ -291,5 +283,13 @@ MIT; see [LICENSE](LICENSE).
 - Hairer, E., Lubich, C. and Shi, Y., 2023. Leapfrog methods for
   relativistic charged-particle dynamics. *SIAM Journal on Numerical
   Analysis, 61*(6), pp.2844-2858.
+- Higuera, A.V. and Cary, J.R., 2017. Structure-preserving second-order
+  integration of relativistic charged particle trajectories in
+  electromagnetic fields. *Physics of Plasmas, 24*(5).
+- Lapenta, G. and Markidis, S., 2011. Particle acceleration and energy
+  conservation in particle in cell simulations. *Physics of Plasmas,
+  18*(7).
+- Vay, J.L., 2008. Simulation of beams or plasmas crossing at
+  relativistic velocity. *Physics of Plasmas, 15*(5).
 - Yoshida, H., 1990. Construction of higher order symplectic
   integrators. *Physics Letters A, 150*(5-7), pp.262-268.
