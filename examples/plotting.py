@@ -112,11 +112,17 @@ plt.rcParams.update({
 
 
 def use_latex(enabled=USETEX):
-    '''Switch LaTeX typesetting on or off.
+    '''
+    Switch LaTeX typesetting on or off.
 
     Under usetex the mathtext and font.sans-serif settings above are
     ignored, since the preamble decides both; they stay in place as the
     fallback for when this is off.
+
+    Parameters
+    ----------
+    enabled : bool, optional
+        Whether to typeset through LaTeX.
     '''
     plt.rcParams.update({
         'text.usetex': enabled,
@@ -150,12 +156,28 @@ SECTORS = [('x', 'position'), ('u', 'velocity')]
 
 
 def resolve(name):
-    '''Find a data file given a path, a filename, or a bare stem.
+    '''
+    Find a data file given a path, a filename, or a bare stem.
 
     Tries the working directory before DATA_DIR so an explicit path
     always wins, and appends the .json suffix only when the name does
     not already carry one -- appending unconditionally would mangle a
     name that has dots in it for other reasons.
+
+    Parameters
+    ----------
+    name : str
+        Path, filename or bare stem of the data file.
+
+    Returns
+    -------
+    Path
+        The data file found.
+
+    Raises
+    ------
+    SystemExit
+        If no matching file exists.
     '''
     given = Path(name)
     names = ([given] if given.suffix == '.json'
@@ -169,7 +191,19 @@ def resolve(name):
 
 
 def find_all():
-    '''Every data file in DATA_DIR, sorted by name.'''
+    '''
+    Every data file in DATA_DIR, sorted by name.
+
+    Returns
+    -------
+    list of Path
+        The data files found.
+
+    Raises
+    ------
+    SystemExit
+        If DATA_DIR holds no .json files.
+    '''
     files = sorted(DATA_DIR.glob('*.json'))
     if not files:
         raise SystemExit(f'no .json files found in {DATA_DIR}/')
@@ -177,7 +211,24 @@ def find_all():
 
 
 def load(filename):
-    '''Read a data file, checking the schema and the required keys.'''
+    '''
+    Read a data file, checking the schema and the required keys.
+
+    Parameters
+    ----------
+    filename : str or Path
+        Data file to read.
+
+    Returns
+    -------
+    dict
+        The record.
+
+    Raises
+    ------
+    ValueError
+        If the schema is wrong, or a required key is missing.
+    '''
     with open(filename) as fh:
         record = json.load(fh)
     if record.get('schema') != SCHEMA:
@@ -193,12 +244,23 @@ def load(filename):
 
 
 def assign_styles(panels):
-    '''Line style, marker and colour for every display name.
+    '''
+    Line style, marker and colour for every display name.
 
     Assigned across all families at once, because matplotlib restarts
     its colour cycle on each new axes: without this a method would
     change colour between columns as soon as two families stopped
     listing the same names in the same order.
+
+    Parameters
+    ----------
+    panels : list of dict
+        Per-family results, as returned by analyse.
+
+    Returns
+    -------
+    dict
+        Display name -> (line style, marker, colour).
     '''
     names = []
     for panel in panels:
@@ -214,11 +276,28 @@ def assign_styles(panels):
 
 
 def differences(states, dt, order):
-    '''Estimated errors and observed orders for one sector.
+    '''
+    Estimated errors and observed orders for one sector.
 
-    states has shape (len(dt), 3), one final state per step size. The
-    returned errors are indexed by the coarser step of each pair, so
+    The returned errors are indexed by the coarser step of each pair, so
     they align with dt[:-1]; the orders are shorter again by one.
+
+    Parameters
+    ----------
+    states : array_like
+        Final states, shape (len(dt), 3), one per step size.
+    dt : array_like
+        Step sizes.
+    order : int
+        Nominal order, used to rescale the successive differences into
+        error estimates.
+
+    Returns
+    -------
+    delta : np.ndarray
+        Estimated errors, shape (len(dt) - 1,).
+    orders : np.ndarray
+        Observed orders, shape (len(dt) - 2,).
     '''
     states = np.asarray(states, dtype=float)
     dt = np.asarray(dt, dtype=float)
@@ -230,11 +309,20 @@ def differences(states, dt, order):
 
 
 def analyse(record):
-    '''Errors and orders for every method in every family.
+    '''
+    Errors and orders for every method in every family.
 
-    Returns a list of per-family dicts carrying the display label, the
-    nominal order, the step sizes the errors correspond to, and a
-    per-method dict of 'x'/'u' errors and orders.
+    Parameters
+    ----------
+    record : dict
+        Record read from a data file.
+
+    Returns
+    -------
+    list of dict
+        One dict per family, carrying the display label, the nominal
+        order, the step sizes the errors correspond to, and a per-method
+        dict of 'x'/'u' errors and orders.
     '''
     panels = []
     for family in record['families']:
@@ -254,6 +342,14 @@ def analyse(record):
 
 
 def print_tables(panels):
+    '''
+    Print the estimated errors and observed orders for every family.
+
+    Parameters
+    ----------
+    panels : list of dict
+        Per-family results, as returned by analyse.
+    '''
     for panel in panels:
         print('#' * 78)
         print(f'# {panel["label"]} methods')
@@ -272,7 +368,23 @@ def print_tables(panels):
 
 
 def plot(panels, record, filename):
-    '''Log-log convergence plots: sectors down the rows, families across.'''
+    '''
+    Log-log convergence plots: sectors down the rows, families across.
+
+    Parameters
+    ----------
+    panels : list of dict
+        Per-family results, as returned by analyse.
+    record : dict
+        Record read from the data file; supplies the title.
+    filename : str
+        Output figure path.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The figure, already saved to filename.
+    '''
     styles = assign_styles(panels)
     n_fam = len(panels)
     fig, axes = plt.subplots(2, n_fam, figsize=(6.2 * n_fam, 9.6),
@@ -328,6 +440,15 @@ def plot(panels, record, filename):
 
 
 def main():
+    '''
+    Plot the data files named on the command line, or all of them.
+
+    Raises
+    ------
+    SystemExit
+        If -o is given with several data files, or if any file is
+        skipped.
+    '''
     parser = argparse.ArgumentParser(description=__doc__.split('\n')[1])
     parser.add_argument('results', nargs='*',
                         help=f'data files, by path or bare name; '

@@ -132,14 +132,14 @@ velocities.
 | ----------------- | ------------------ | ------------------ | -------- |
 | Boris             | `Boris`            | `BorisOrderFour`   | explicit |
 | Vay               | `Vay`              | `VayOrderFour`     | explicit |
-| Higuera-Cary      | `Higuera`          | `HigueraOrderFour` | explicit |
-| Lapenta-Markidis  | `Lapenta`          | n/a                | implicit |
+| Higuera–Cary      | `Higuera`          | `HigueraOrderFour` | explicit |
+| Lapenta–Markidis  | `Lapenta`          | n/a                | implicit |
 | Discrete gradient | `DiscreteGradient` | n/a                | implicit |
 
 `DiscreteGradient` conserves the energy `gamma m + q phi` exactly for
 static fields.
 
-### Comoving frame: Gordon-Hafizi
+### Comoving frame: Gordon–Hafizi
 
 4-vectors, stepped in proper time or, for the `Lab` classes, in lab
 time. All four operators are explicit.
@@ -155,7 +155,7 @@ The exact operator solves the equations of motion exactly in a locally
 constant field. The quadratic operator is a rational approximation
 that preserves unit determinant and is exact for null fields.
 
-### Comoving frame: Hairer-Lubich-Shi
+### Comoving frame: Hairer–Lubich–Shi
 
 4-vectors, stepped in proper time, with velocities on a staggered grid.
 All three are second order.
@@ -178,7 +178,7 @@ component of the 4-position. Comparing the two at a common step size
 therefore needs the comoving-frame methods to take controlled lab-time
 steps.
 
-The `Lab` variants of the Gordon-Hafizi pushers do this. For each lab
+The `Lab` variants of the Gordon–Hafizi pushers do this. For each lab
 step `dt` they solve the trapezoidal relation
 
 ```text
@@ -192,7 +192,7 @@ even-power error structure of the underlying proper-time method.
 The fourth-order classes compose a symmetric second-order step three
 times with Yoshida's triple-jump coefficients. This needs a
 time-symmetric base step, which the explicit lab-frame methods and the
-Gordon-Hafizi methods provide, in both proper and lab time.
+Gordon–Hafizi methods provide, in both proper and lab time.
 
 ## Things to know
 
@@ -203,7 +203,7 @@ Gordon-Hafizi methods provide, in both proper and lab time.
   field that lacks them, but integrates the wrong problem.
 - The discrete gradient methods conserve energy exactly only for static
   fields.
-- The Hairer-Lubich-Shi pushers return velocities at half-integer
+- The Hairer–Lubich–Shi pushers return velocities at half-integer
   steps; see the `solve` docstring of those classes for the shapes.
 - `t_span` must be increasing, and `N` a positive integer.
 

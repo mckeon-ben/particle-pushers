@@ -91,7 +91,7 @@ class Lapenta(Pusher):
             u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)
         except RuntimeError as e:
             raise RuntimeError(
-                f"Lapenta-Markidis solver failed to converge: {e}"
+                f'Lapenta-Markidis solver failed to converge: {e}'
             ) from e
 
         # Position update using average of old and new velocities.

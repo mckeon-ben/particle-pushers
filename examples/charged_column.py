@@ -77,10 +77,21 @@ T = 256.0
 
 
 def column_field(k=K):
-    '''Axial field growing with radius, plus the potential of an axial charge.
+    '''
+    Axial field growing with radius, plus the potential of an axial charge.
 
     E is written analytically rather than differenced from the potential,
     so it is curl-free to round-off.
+
+    Parameters
+    ----------
+    k : float, optional
+        Field strength of the axial charge.
+
+    Returns
+    -------
+    StaticField
+        The combined electric and magnetic field.
     '''
 
     def E_func(x):
@@ -94,11 +105,26 @@ def column_field(k=K):
 
 
 def _spatial(x, u, is_gordon):
-    '''Spatial 3-vectors (x, u), whichever convention the method uses.
+    '''
+    Spatial 3-vectors (x, u), whichever convention the method uses.
 
     Gordon methods carry 4-vectors with lab time in x[0] and gamma in
     u[0]; lab-frame methods carry bare 3-vectors. Dropping the zeroth
     slot puts both on the same footing.
+
+    Parameters
+    ----------
+    x, u : np.ndarray
+        Position and velocity, as 3-vectors or 4-vectors.
+    is_gordon : bool
+        Whether the method carries 4-vectors.
+
+    Returns
+    -------
+    x : np.ndarray
+        Spatial position, shape (3,).
+    u : np.ndarray
+        Spatial velocity, shape (3,).
     '''
     if is_gordon:
         return x[1:], u[1:]
@@ -106,7 +132,34 @@ def _spatial(x, u, is_gordon):
 
 
 def final_state(method_cls, x0, u0, q, m, field, T, N, is_gordon):
-    '''Integrate one pusher over [0, T] with N steps; return final (x, u).'''
+    '''
+    Integrate one pusher over [0, T] with N steps; return final (x, u).
+
+    Parameters
+    ----------
+    method_cls : type
+        Pusher class to instantiate.
+    x0, u0 : np.ndarray
+        Initial position and velocity in the representation the method
+        expects: 4-vectors for Gordon methods, 3-vectors otherwise.
+    q, m : float
+        Particle charge and mass.
+    field : Field
+        Electromagnetic field.
+    T : float
+        Final lab time.
+    N : int
+        Number of steps.
+    is_gordon : bool
+        Whether the method carries 4-vectors.
+
+    Returns
+    -------
+    x : np.ndarray
+        Final spatial position, shape (3,).
+    u : np.ndarray
+        Final spatial velocity, shape (3,).
+    '''
     particle = Particle(x=x0.copy(), u=u0.copy(), q=q, m=m)
     pusher = method_cls(particle, field)
     _, x_out, u_out = pusher.solve((0.0, T), N)
@@ -114,7 +167,34 @@ def final_state(method_cls, x0, u0, q, m, field, T, N, is_gordon):
 
 
 def run_method(method_cls, x0, u0, q, m, field, T, n_list, is_gordon):
-    '''Final states for one method at every step count, shape (len, 3).'''
+    '''
+    Final states for one method at every step count.
+
+    Parameters
+    ----------
+    method_cls : type
+        Pusher class to instantiate.
+    x0, u0 : np.ndarray
+        Initial position and velocity in the representation the method
+        expects: 4-vectors for Gordon methods, 3-vectors otherwise.
+    q, m : float
+        Particle charge and mass.
+    field : Field
+        Electromagnetic field.
+    T : float
+        Final lab time.
+    n_list : sequence of int
+        Step counts.
+    is_gordon : bool
+        Whether the method carries 4-vectors.
+
+    Returns
+    -------
+    xs : np.ndarray
+        Final spatial positions, shape (len(n_list), 3).
+    us : np.ndarray
+        Final spatial velocities, shape (len(n_list), 3).
+    '''
     finals = [final_state(method_cls, x0, u0, q, m, field, T, N, is_gordon)
               for N in n_list]
     return (np.array([f[0] for f in finals]),
@@ -123,10 +203,38 @@ def run_method(method_cls, x0, u0, q, m, field, T, n_list, is_gordon):
 
 def run_family(field, x0_3, u0_3, q, m, T, n_list, lab_methods,
                gordon_methods, label='', order=2):
-    '''Run one family and return its serialisable record.
+    '''
+    Run one family and return its serialisable record.
 
     Lab-frame methods take the 3-vector state; Gordon methods take the
     4-vector lift (lab time in x[0], gamma in u[0]).
+
+    Parameters
+    ----------
+    field : Field
+        Electromagnetic field.
+    x0_3, u0_3 : np.ndarray
+        Initial spatial position and velocity, each shape (3,).
+    q, m : float
+        Particle charge and mass.
+    T : float
+        Final lab time.
+    n_list : sequence of int
+        Step counts.
+    lab_methods, gordon_methods : dict
+        Display name -> pusher class, for the lab-frame and Gordon
+        methods of the family.
+    label : str, optional
+        Family label, used in the progress output and the record.
+    order : int, optional
+        Nominal order of the family, stored in the record.
+
+    Returns
+    -------
+    dict
+        Keys 'label', 'order', 'dt', 'method_order' and 'methods', the
+        last mapping each display name to its class, frame and final
+        'x' and 'u' states.
     '''
     gamma0 = np.sqrt(1.0 + u0_3 @ u0_3)
     x0_4 = np.hstack([0.0, x0_3])
@@ -154,6 +262,22 @@ def run_family(field, x0_3, u0_3, q, m, T, n_list, lab_methods,
 
 
 def main(filename=DATA_FILE, q=Q, m=M):
+    '''
+    Run every family and write the data file.
+
+    Parameters
+    ----------
+    filename : str, optional
+        Path of the JSON data file; by default in the data folder beside
+        this script.
+    q, m : float, optional
+        Particle charge and mass.
+
+    Returns
+    -------
+    dict
+        The record written to the data file.
+    '''
     field = column_field()
     x0_3, u0_3 = X_START.copy(), U_START.copy()
 

@@ -56,7 +56,7 @@ class Hairer(Pusher):
         '''
         Construct the electromagnetic field tensor F.
 
-        Builds the 4×4 electromagnetic field tensor from the electric
+        Builds the 4x4 electromagnetic field tensor from the electric
         and magnetic field vectors. Field values are evaluated from
         self.field if not provided explicitly.
 
@@ -432,8 +432,8 @@ class HairerDiscreteGradient(Hairer):
             u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)
         except RuntimeError as e:
             raise RuntimeError(
-                "Hairer-Lubich-Shi discrete gradient solver failed to "
-                f"converge: {e}") from e
+                'Hairer-Lubich-Shi discrete gradient solver failed to '
+                f'converge: {e}') from e
 
         x_new = x + u_new * dt
         return x_new, u_new
@@ -465,7 +465,7 @@ class HairerVariational(Hairer):
         Construct the Jacobian of the 4-potential with respect to the
         4-position.
 
-        Assembles the 4×4 matrix partial_mu A_nu from the electric
+        Assembles the 4x4 matrix partial_mu A_nu from the electric
         field, partial time derivatives and spatial Jacobian of
         the vector potential.
 
@@ -553,8 +553,8 @@ class HairerVariational(Hairer):
             u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)
         except RuntimeError as e:
             raise RuntimeError(
-                "Hairer-Lubich-Shi variational solver failed to "
-                f"converge: {e}") from e
+                'Hairer-Lubich-Shi variational solver failed to '
+                f'converge: {e}') from e
 
         x_new = x + u_new * dt
         return x_new, u_new

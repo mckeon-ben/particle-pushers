@@ -3,7 +3,7 @@ Higuera-Cary lab-frame particle pusher.
 
 Implements the Higuera-Cary leapfrog method for relativistic charged
 particle tracking in the lab frame. The Higuera-Cary method is both
-volume-preserving and correctly captures the E×B drift velocity,
+volume-preserving and correctly captures the E x B drift velocity,
 combining the key properties of the Boris and Vay methods. All
 quantities are in natural units where c = 1.
 
@@ -24,7 +24,7 @@ class Higuera(Pusher):
     Higuera-Cary leapfrog pusher for relativistic charged particle tracking.
 
     A second-order explicit leapfrog method that is both volume-preserving
-    and correctly captures the E×B drift velocity. The velocity update
+    and correctly captures the E x B drift velocity. The velocity update
     uses a relativistic correction to the rotation angle computed from
     the half-accelerated momentum, combining the structure-preserving
     property of Boris with the correct drift behaviour of Vay.
@@ -33,7 +33,7 @@ class Higuera(Pusher):
     -----
     - Second-order accurate in dt
     - Volume-preserving in phase space
-    - Correctly captures the E×B drift velocity
+    - Correctly captures the E x B drift velocity
     '''
 
     def _step(self, x, u, t_n, dt):
@@ -101,7 +101,7 @@ class HigueraOrderFour(PusherOrderFour, Higuera):
     Notes
     -----
     - Fourth-order accurate in dt
-    - Volume-preserving in phase space and correct E×B drift
+    - Volume-preserving in phase space and correct E x B drift
       (inherited from Higuera-Cary)
     '''
     pass

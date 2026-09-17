@@ -6,7 +6,7 @@ tracking in the lab frame. All quantities are in natural units where c = 1.
 
 References
 ----------
-Boris, J.P., 1970. Relativistic Plasma Simulation — Optimization of
+Boris, J.P., 1970. Relativistic Plasma Simulation -- Optimization of
 a Hybrid Code. In Proc. Fourth Conf. Num. Sim. Plasmas (pp. 3-67).
 '''
 
@@ -28,7 +28,7 @@ class Boris(Pusher):
     -----
     - Second-order accurate in dt
     - Volume-preserving in phase space
-    - Correct E×B drift to leading order
+    - Correct E x B drift to leading order
     '''
 
     def _step(self, x, u, t_n, dt):

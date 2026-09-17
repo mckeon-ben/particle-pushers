@@ -222,7 +222,8 @@ class PusherOrderFour(Pusher):
     _lab_time = True
 
     def _substep(self, x, u, t_n, dt):
-        '''Single composition sub-step.
+        '''
+        Single composition sub-step.
 
         Defaults to the concrete pusher's ``_step``, dispatching on the
         ``_lab_time`` signature. Subclasses may override to route the Yoshida
@@ -230,6 +231,22 @@ class PusherOrderFour(Pusher):
         that solves for the proper-time increment realising each weighted
         lab-time sub-step). The ``t_n`` argument is accepted for signature
         uniformity and ignored by comoving-frame steps.
+
+        Parameters
+        ----------
+        x, u : np.ndarray
+            Current position and velocity.
+        t_n : float
+            Current lab time.
+        dt : float
+            Weighted sub-step length.
+
+        Returns
+        -------
+        x_new : np.ndarray
+            Updated particle position.
+        u_new : np.ndarray
+            Updated particle velocity.
         '''
         if self._lab_time:
             return self._step(x, u, t_n, dt)

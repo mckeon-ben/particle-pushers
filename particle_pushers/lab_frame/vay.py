@@ -3,7 +3,7 @@ Vay lab-frame particle pusher.
 
 Implements the Vay leapfrog method for relativistic charged particle
 tracking in the lab frame. The Vay method correctly captures the
-E×B drift velocity by construction. All quantities are in natural
+E x B drift velocity by construction. All quantities are in natural
 units where c = 1.
 
 References
@@ -22,7 +22,7 @@ class Vay(Pusher):
     Vay leapfrog pusher for relativistic charged particle tracking.
 
     A second-order explicit leapfrog method that correctly captures
-    the E×B drift velocity. The velocity update uses a relativistic
+    the E x B drift velocity. The velocity update uses a relativistic
     correction to the rotation angle that accounts for the full
     Lorentz factor after the combined electric and magnetic field
     update.
@@ -30,7 +30,7 @@ class Vay(Pusher):
     Notes
     -----
     - Second-order accurate in dt
-    - Correctly captures the E×B drift velocity
+    - Correctly captures the E x B drift velocity
     - Not volume-preserving in general
     '''
 
@@ -98,6 +98,6 @@ class VayOrderFour(PusherOrderFour, Vay):
     Notes
     -----
     - Fourth-order accurate in dt
-    - Correctly captures the E×B drift velocity (inherited from Vay)
+    - Correctly captures the E x B drift velocity (inherited from Vay)
     '''
     pass
