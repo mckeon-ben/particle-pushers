@@ -58,15 +58,16 @@ import matplotlib.pyplot as plt
 
 SCHEMA = 1
 
-# Where results files live when they are not given by an explicit path.
+# Where results files live when they are not given by an explicit path:
+# the data folder beside this script, wherever it is run from.
 # A bare name on the command line is resolved against the working
 # directory first and then here, and passing no name at all plots every
 # results file in this folder.
-DATA_DIR = Path('data')
+DATA_DIR = Path(__file__).resolve().parent / 'data'
 
 # Where figures are written, kept apart from the data folder so one
 # directory holds only inputs and the other only outputs.
-PLOT_DIR = Path('plots')
+PLOT_DIR = Path(__file__).resolve().parent / 'plots'
 
 # Default output format. Vector, so the figure stays sharp at any zoom
 # and at whatever size a paper puts it. Pass -o with another extension

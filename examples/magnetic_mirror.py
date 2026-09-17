@@ -24,8 +24,10 @@ from particle_pushers.comoving_frame import (
 )
 
 
-# Written into the data folder.
-DATA_DIR = 'data'
+# Written into the data folder beside this script, wherever it is
+# run from.
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        'data')
 DATA_FILE = os.path.join(DATA_DIR, 'magnetic_mirror.json')
 
 # Names the figure.

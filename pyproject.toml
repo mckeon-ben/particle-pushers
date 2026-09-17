@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=64", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -16,7 +16,10 @@ authors = [
 description = "A suite of relativistic charged-particle integrators."
 readme = "README.md"
 license = "MIT"
-license-files = ["LICENSE.*"]
+license-files = ["LICENSE"]
 
 [project.urls]
 Repository = "https://github.com/mckeon-ben/particle-pushers"
+
+[tool.setuptools.packages.find]
+include = ["particle_pushers*"]
