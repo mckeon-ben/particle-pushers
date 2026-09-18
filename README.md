@@ -230,11 +230,9 @@ directory: data files always go to `examples/data/` and figures to
 
 ```bash
 python examples/magnetic_mirror.py
-python examples/plotting.py                    # every data file
 python examples/plotting.py magnetic_mirror    # one data file
+python examples/plotting.py                    # every data file
 ```
-
-The full step sequences make each script take a while to run.
 
 `plotting.py` needs matplotlib and, by default, a LaTeX installation
 with the `helvet` and `sansmath` packages, since it typesets through
