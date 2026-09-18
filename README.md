@@ -26,7 +26,7 @@ quantities are in natural units with *c* = 1.
 
 ## Installation
 
-`particle-pushers` needs Python 3.9 or later, NumPy and SciPy:
+`particle-pushers` needs Python 3.9 or later, NumPy, SciPy and matplotlib:
 
 ```bash
 git clone https://github.com/mckeon-ben/particle-pushers.git
@@ -35,8 +35,8 @@ pip install .
 ```
 
 Use `pip install -e .` instead to work on the code in place. The
-scripts in `examples/` also need matplotlib and a LaTeX installation;
-see [Examples](#examples).
+scripts in `examples/` also need a LaTeX installation; see
+[Examples](#examples).
 
 ## Quick start
 
@@ -234,10 +234,10 @@ python examples/plotting.py magnetic_mirror    # one data file
 python examples/plotting.py                    # every data file
 ```
 
-`plotting.py` needs matplotlib and, by default, a LaTeX installation
-with the `helvet` and `sansmath` packages, since it typesets through
-LaTeX. Set `USETEX = False` at the top of the script to use
-matplotlib's own renderer instead.
+`plotting.py` typesets through LaTeX by default, needing an
+installation with the `helvet` and `sansmath` packages. Set
+`USETEX = False` at the top of the script to use matplotlib's own
+renderer instead.
 
 ## Package layout
 
