@@ -1,6 +1,9 @@
 '''
 Planar undulator.
 
+Integrates every pusher over a fixed lab time at a sequence of step
+counts and writes the final states to a JSON data file.
+
 Natural units, c = 1, with k = 2 pi so the undulator period is unity.
 '''
 
@@ -9,6 +12,7 @@ import os
 import time
 
 import numpy as np
+
 from particle_pushers.particle import Particle
 from particle_pushers.field import StaticField
 from particle_pushers.lab_frame import (
@@ -17,7 +21,7 @@ from particle_pushers.lab_frame import (
 )
 from particle_pushers.comoving_frame import (
     GordonQuadraticLab, GordonExactLab,
-    GordonQuadraticLabOrderFour, GordonExactLabOrderFour
+    GordonQuadraticLabOrderFour, GordonExactLabOrderFour,
 )
 
 
@@ -63,7 +67,6 @@ FAMILIES = [
      [1024, 2048, 4096, 8192, 16384]),
 ]
 
-
 # Undulator strength and period. K = B0 / k is the undulator
 # parameter; below one the wiggle is a small perturbation on the
 # forward motion, which is the usual operating regime.
@@ -71,7 +74,7 @@ B0 = 1.0
 K_WAVE = 2.0 * np.pi
 Q, M = 1.0, 1.0
 
-# Launch state: proton injected along the axis.
+# Launch state: positive test particle injected along the axis.
 X_START = np.zeros(3)
 U_START = np.array([0.0, 0.0, 5.0])
 

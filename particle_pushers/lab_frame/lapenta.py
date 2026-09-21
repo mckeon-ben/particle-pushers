@@ -13,6 +13,7 @@ conservation in particle in cell simulations. Physics of Plasmas, 18(7).
 
 import numpy as np
 from scipy.optimize import fixed_point
+
 from ..pusher import Pusher
 from ..lorentz import lorentz_gamma
 

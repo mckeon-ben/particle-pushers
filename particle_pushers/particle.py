@@ -4,8 +4,9 @@ Particle dataclass for relativistic charged particle tracking.
 All quantities are assumed to be in natural units where c = 1.
 '''
 
-import numpy as np
 from dataclasses import dataclass
+
+import numpy as np
 
 
 @dataclass

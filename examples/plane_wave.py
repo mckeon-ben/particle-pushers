@@ -12,6 +12,7 @@ import os
 import time
 
 import numpy as np
+
 from particle_pushers.particle import Particle
 from particle_pushers.field import TimeDependentField
 from particle_pushers.lab_frame import (
@@ -20,7 +21,7 @@ from particle_pushers.lab_frame import (
 )
 from particle_pushers.comoving_frame import (
     GordonQuadraticLab, GordonExactLab,
-    GordonQuadraticLabOrderFour, GordonExactLabOrderFour
+    GordonQuadraticLabOrderFour, GordonExactLabOrderFour,
 )
 
 

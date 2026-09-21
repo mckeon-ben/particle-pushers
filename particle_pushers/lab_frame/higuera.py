@@ -15,6 +15,7 @@ electromagnetic fields. Physics of Plasmas, 24(5).
 '''
 
 import numpy as np
+
 from ..pusher import Pusher, PusherOrderFour
 from ..lorentz import lorentz_gamma
 

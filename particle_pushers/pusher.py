@@ -12,8 +12,10 @@ Yoshida, H., 1990. Construction of higher order symplectic
 integrators. Physics Letters A, 150(5-7), pp.262-268.
 '''
 
-import numpy as np
 from abc import ABC, abstractmethod
+
+import numpy as np
+
 from .field import Field
 from .particle import Particle
 
@@ -66,7 +68,7 @@ class Pusher(ABC):
     >>> t, x, u = sim.solve((0, 2 * np.pi), N=1000)
     '''
 
-    def __init__(self, particle: Particle, field: Field):
+    def __init__(self, particle, field):
         if not isinstance(particle, Particle):
             raise TypeError(
                 f'particle must be a Particle instance, '
@@ -80,7 +82,7 @@ class Pusher(ABC):
         self.q_over_m = particle.q / particle.m
 
     @abstractmethod
-    def advance(self, t_n: float, dt: float) -> tuple:
+    def advance(self, t_n, dt):
         '''
         Advance the particle state by one time step.
 
@@ -182,14 +184,13 @@ class PusherOrderFour(Pusher):
     Frame-agnostic Yoshida triple-jump fourth-order composition.
 
     Lifts a symmetric second-order pusher to fourth-order accuracy by applying
-    its base step three times with coefficients (w1, w0, w1), where the central
-    coefficient w0 is negative (a backward sub-step), chosen so that
-    the leading
-    third-order error term of the symmetric base step cancels. The composition
-    is fourth-order provided the base step is time-symmetric, which holds for
-    the explicit lab-frame methods (Boris, Vay, Higuera-Cary) and the
-    Gordon-Hafizi methods (GordonExact, GordonQuadratic), so a single base
-    serves both frames.
+    its base step three times with coefficients (w1, w0, w1), where the
+    central coefficient w0 is negative (a backward sub-step), chosen so that
+    the leading third-order error term of the symmetric base step cancels. The
+    composition is fourth-order provided the base step is time-symmetric,
+    which holds for the explicit lab-frame methods (Boris, Vay, Higuera-Cary)
+    and the Gordon-Hafizi methods (GordonExact, GordonQuadratic), so a single
+    base serves both frames.
 
     This class provides the composed advance() only. The single-step method
     _step() is supplied by a concrete pusher mixed in by the subclass, listed

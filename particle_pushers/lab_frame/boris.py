@@ -11,6 +11,7 @@ a Hybrid Code. In Proc. Fourth Conf. Num. Sim. Plasmas (pp. 3-67).
 '''
 
 import numpy as np
+
 from ..pusher import Pusher, PusherOrderFour
 from ..lorentz import lorentz_gamma
 

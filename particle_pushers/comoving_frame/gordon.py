@@ -15,6 +15,7 @@ for extreme fields. Computer Physics Communications, 258, p.107628.
 '''
 
 import numpy as np
+
 from ..pusher import Pusher, PusherOrderFour
 
 
@@ -24,7 +25,9 @@ _PAULI = np.array([
     np.array([[0, -1j], [1j, 0]]),
     np.array([[1, 0], [0, -1]])
 ])
-'''Pauli matrix array used for spinor conversions.'''
+'''
+Pauli matrix array used for spinor conversions.
+'''
 
 
 def _sinhc(z):
@@ -239,7 +242,6 @@ class GordonExact(Gordon):
     -----
     - Second-order accurate in dt
     - Exact for uniform fields
-
     '''
 
     def _compute_time_operator(self, F, field_invariant, dtau):
@@ -278,7 +280,6 @@ class GordonQuadratic(Gordon):
     - Second-order accurate in dt
     - Unit determinant preserved by construction
     - Exact for null electromagnetic fields
-
     '''
 
     def _compute_time_operator(self, F, field_invariant, dtau):

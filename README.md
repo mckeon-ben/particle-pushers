@@ -108,8 +108,8 @@ position and time (`TimeDependentField`):
 
 - `E_func` and `B_func`, the electric and magnetic fields, which every
   pusher uses;
-- `phi_func`, the scalar potential, needed by `DiscreteGradient` and
-  `HairerDiscreteGradient`;
+- `phi_func`, the scalar potential, needed by `DiscreteGradient`,
+  `HairerDiscreteGradient` and `HairerVariational`;
 - `A_func`, `A_x_func` and, for time-dependent fields, `phi_t_func`
   and `A_t_func`: the vector potential, its Jacobian and the time
   derivatives, needed by `HairerVariational`.

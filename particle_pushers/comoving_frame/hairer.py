@@ -19,16 +19,19 @@ Analysis, 61(6), pp.2844-2858.
 '''
 
 import warnings
-import numpy as np
 from abc import abstractmethod
+
+import numpy as np
 from scipy.linalg import lu_factor, lu_solve
 from scipy.optimize import fixed_point
+
 from ..pusher import Pusher
 from ..field import TimeDependentField
 
 
 _M_INV = np.diag((-1., 1., 1., 1.))
-'''Inverse Minkowski metric tensor.
+'''
+Inverse Minkowski metric tensor.
 
 Since M = diag(-1, 1, 1, 1), the metric is its own inverse.
 '''
@@ -145,8 +148,16 @@ class Hairer(Pusher):
             4-position array at integer steps, shape (N + 1, 4).
         u_out : np.ndarray
             4-velocity array at half-integer steps, shape (N, 4).
+
+        Raises
+        ------
+        TypeError
+            If N is not an integer.
+        ValueError
+            If N is not positive, or if t_span does not contain exactly
+            two elements with t_start < t_end.
         '''
-        # Delegate input validation to Pusher.solve before proceeding.
+        # Validate the inputs as Pusher.solve does.
         if not isinstance(N, (int, np.integer)):
             raise TypeError(f'N must be an integer, got {type(N).__name__}')
         if N <= 0:
@@ -547,7 +558,8 @@ class HairerVariational(Hairer):
             A_next = self.field.A(x_next[1:], x_next[0])
             A4_next = np.hstack((-phi_next, A_next))
             A_bar = (A4_next - A4_prev) / 2
-            return lu_solve(lu_fac, num_fac @ u - _M_INV @ A_bar)
+            return lu_solve(lu_fac,
+                            num_fac @ u - self.q_over_m * (_M_INV @ A_bar))
 
         try:
             u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)

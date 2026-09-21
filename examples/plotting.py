@@ -1,5 +1,5 @@
 '''
-Reads JSON data files turning the stored final states into error
+Reads JSON data files, turning the stored final states into error
 estimates and observed orders, prints the tables and draws the figure.
 
 File contract
@@ -45,24 +45,23 @@ is exactly halved, but the general form does not silently misreport when
 it is not: a step list that doubles everywhere except once, as a typo
 easily produces, would otherwise show an order error of about half a per
 cent at the affected pair and look like real behaviour.
-
 '''
 
 import argparse
 import json
 from pathlib import Path
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 SCHEMA = 1
 
-# Where results files live when they are not given by an explicit path:
+# Where data files live when they are not given by an explicit path:
 # the data folder beside this script, wherever it is run from.
 # A bare name on the command line is resolved against the working
 # directory first and then here, and passing no name at all plots every
-# results file in this folder.
+# data file in this folder.
 DATA_DIR = Path(__file__).resolve().parent / 'data'
 
 # Where figures are written, kept apart from the data folder so one
@@ -449,7 +448,8 @@ def main():
         If -o is given with several data files, or if any file is
         skipped.
     '''
-    parser = argparse.ArgumentParser(description=__doc__.split('\n')[1])
+    parser = argparse.ArgumentParser(
+        description=' '.join(__doc__.split('\n\n')[0].split()))
     parser.add_argument('results', nargs='*',
                         help=f'data files, by path or bare name; '
                              f'omit to plot every .json in '
@@ -464,7 +464,7 @@ def main():
     files = ([resolve(name) for name in args.results] if args.results
              else find_all())
     if args.output and len(files) > 1:
-        raise SystemExit('-o takes a single results file; with several, '
+        raise SystemExit('-o takes a single data file; with several, '
                          'each figure is named after its own input')
 
     if not args.output:

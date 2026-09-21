@@ -5,11 +5,11 @@ electromagnetic field simulation.
 A Python package implementing various explicit and implicit numerical
 integrators for tracking relativistic charged test particles in static
 and time-dependent electromagnetic fields. All quantities are in natural
-units where c = 1. Lab-frame methods integrate in lab time and
-comoving-frame methods integrate in proper time. The base methods are
-second-order accurate; fourth-order variants of the explicit lab-frame
-methods and the Gordon-Hafizi methods are provided via Yoshida triple-jump
-composition.
+units where c = 1. Lab-frame methods integrate in lab time, and
+comoving-frame methods in proper time or, through a symmetric time
+conversion, in lab time. The base methods are second-order accurate;
+fourth-order variants of the explicit lab-frame methods and the
+Gordon-Hafizi methods are provided via Yoshida triple-jump composition.
 
 Classes
 -------

@@ -31,7 +31,7 @@ class Field:
     subclasses are free to override any subset of its methods.
     '''
 
-    def E(self, x, t=None) -> np.ndarray:
+    def E(self, x, t=None):
         '''
         Electric field vector.
 
@@ -50,7 +50,7 @@ class Field:
         '''
         return np.zeros(3)
 
-    def B(self, x, t=None) -> np.ndarray:
+    def B(self, x, t=None):
         '''
         Magnetic field vector.
 
@@ -69,7 +69,7 @@ class Field:
         '''
         return np.zeros(3)
 
-    def phi(self, x, t=None) -> float:
+    def phi(self, x, t=None):
         '''
         Electric scalar potential.
 
@@ -88,7 +88,7 @@ class Field:
         '''
         return 0.0
 
-    def A(self, x, t=None) -> np.ndarray:
+    def A(self, x, t=None):
         '''
         Magnetic vector potential.
 
@@ -107,7 +107,7 @@ class Field:
         '''
         return np.zeros(3)
 
-    def phi_t(self, x, t=None) -> float:
+    def phi_t(self, x, t=None):
         '''
         Partial time derivative of the scalar potential.
 
@@ -126,7 +126,7 @@ class Field:
         '''
         return 0.0
 
-    def A_t(self, x, t=None) -> np.ndarray:
+    def A_t(self, x, t=None):
         '''
         Partial time derivative of the vector potential.
 
@@ -145,7 +145,7 @@ class Field:
         '''
         return np.zeros(3)
 
-    def A_x(self, x, t=None) -> np.ndarray:
+    def A_x(self, x, t=None):
         '''
         Spatial Jacobian of the vector potential.
 

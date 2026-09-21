@@ -15,8 +15,10 @@ systems. Journal of Nonlinear Science, 6(5), pp.449-467.
 '''
 
 import warnings
+
 import numpy as np
 from scipy.optimize import fixed_point
+
 from ..pusher import Pusher
 from ..field import TimeDependentField
 from ..lorentz import lorentz_gamma

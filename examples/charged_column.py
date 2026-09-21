@@ -12,6 +12,7 @@ import os
 import time
 
 import numpy as np
+
 from particle_pushers.particle import Particle
 from particle_pushers.field import StaticField
 from particle_pushers.lab_frame import (
@@ -20,7 +21,7 @@ from particle_pushers.lab_frame import (
 )
 from particle_pushers.comoving_frame import (
     GordonQuadraticLab, GordonExactLab,
-    GordonQuadraticLabOrderFour, GordonExactLabOrderFour
+    GordonQuadraticLabOrderFour, GordonExactLabOrderFour,
 )
 
 
@@ -72,7 +73,7 @@ X_START = np.array([0.9, 0.0, 0.0])
 U_START = np.array([0.1, 0.0, 0.0])
 Q, M = 1.0, 1.0
 
-# Final lab time, about fourteen gyroperiods.
+# Final lab time, about thirty-eight gyroperiods.
 T = 256.0
 
 
