@@ -115,6 +115,10 @@ plt.rcParams.update({
     'mathtext.it': 'sans:italic',
     'mathtext.bf': 'sans:bold',
     'mathtext.cal': 'sans',
+    'axes.grid': True,
+    # Opaque rather than translucent, which EPS cannot store.
+    'grid.color': '0.9',
+    'figure.dpi': 150,
     'legend.fontsize': 8,
     # Embed TrueType rather than the Type 3 fonts matplotlib writes by
     # default.
@@ -273,7 +277,7 @@ def load(filename):
         raise ValueError(f'{filename}: schema {record.get("schema")!r}, '
                          f'expected {SCHEMA}')
     if 'families' not in record:
-        raise ValueError(f'{filename}: missing required key {"families"!r}')
+        raise ValueError(f"{filename}: missing required key 'families'")
     for family in record['families']:
         if 'dt' not in family:
             raise ValueError(f'{filename}: family {family.get("label")!r} '
@@ -311,6 +315,89 @@ def assign_styles(panels):
             name, ('-', FALLBACK_MARKERS[i % len(FALLBACK_MARKERS)]))
         styles[name] = (ls, marker, PALETTE[i % len(PALETTE)])
     return styles
+
+
+def place_label(ax, text, x, y, renderer, side='below'):
+    '''
+    Label a guide line where the label overlaps no line.
+
+    Tries the preferred side of the guide at points along it, from its
+    middle outwards, before the other side. Below the guide the label
+    goes to the right of the point, then directly under it; above, to
+    the left, then directly over it. Offsetting it sideways first keeps
+    it off a rising guide however steep. The first placement that lies
+    inside the axes, clear of the frame by the same gap as the guide,
+    and touches no line or marker drawn on them is kept; if none does,
+    the label takes the first placement tried. Call once the layout is
+    final, since the test is made in display coordinates.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        Axes holding the guide.
+    text : str
+        Label text.
+    x, y : np.ndarray
+        Points of the guide, on log-log axes.
+    renderer : matplotlib.backend_bases.RendererBase
+        Renderer used to measure the label.
+    side : {'below', 'above'}, optional
+        Side of the guide tried first; the one away from the data, so
+        the label cannot be read as labelling a curve. Default 'below'.
+
+    Returns
+    -------
+    matplotlib.text.Annotation
+        The placed label.
+    '''
+    lx, ly = np.log(x), np.log(y)
+    order = np.argsort(lx)
+    lines = ax.get_lines()
+    paths = [line.get_transform().transform_path(line.get_path())
+             for line in lines]
+    points = [line.get_transform().transform(line.get_xydata())
+              for line in lines if line.get_marker() not in (None, 'None')]
+    pad = renderer.points_to_pixels(plt.rcParams['lines.markersize'])
+    gap = 4
+    # The label keeps the same gap from the frame as from the guide.
+    frame = ax.get_window_extent(renderer).padded(
+        -renderer.points_to_pixels(gap))
+    label = ax.annotate(text, xy=(x[0], y[0]), xytext=(0, 0),
+                        textcoords='offset points')
+    # Offset in points, then horizontal and vertical alignment.
+    placements = {
+        'below': [((gap, -gap), 'left', 'top'), ((0, -gap), 'center', 'top')],
+        'above': [((-gap, gap), 'right', 'bottom'),
+                  ((0, gap), 'center', 'bottom')],
+    }
+    other = 'above' if side == 'below' else 'below'
+    candidates = []
+    for sides in (placements[side], placements[other]):
+        for fraction in (0.5, 0.3, 0.7, 0.1, 0.9):
+            at = lx.min() + fraction * (lx.max() - lx.min())
+            xy = (np.exp(at), np.exp(np.interp(at, lx[order], ly[order])))
+            candidates += [(xy, placement) for placement in sides]
+
+    def put(xy, placement):
+        offset, ha, va = placement
+        label.xy = xy
+        label.set_position(offset)
+        label.set_ha(ha)
+        label.set_va(va)
+
+    for xy, placement in candidates:
+        put(xy, placement)
+        box = label.get_window_extent(renderer)
+        inside = (frame.x0 <= box.x0 and box.x1 <= frame.x1
+                  and frame.y0 <= box.y0 and box.y1 <= frame.y1)
+        clear = (not any(path.intersects_bbox(box, filled=False)
+                         for path in paths)
+                 and not any(box.padded(pad).contains(px, py)
+                             for pts in points for px, py in pts))
+        if inside and clear:
+            return label
+    put(*candidates[0])
+    return label
 
 
 def differences(states, dt, order):
@@ -379,15 +466,18 @@ def analyse(record):
     return panels
 
 
-def print_tables(panels):
+def print_tables(record, panels):
     '''
     Print the estimated errors and observed orders for every family.
 
     Parameters
     ----------
+    record : dict
+        Record read from a data file; supplies the heading.
     panels : list of dict
         Per-family results, as returned by analyse.
     '''
+    print(f'\n{record.get("experiment", "Richardson self-convergence")}')
     for panel in panels:
         print('#' * 78)
         print(f'# {panel["label"]} methods')
@@ -405,17 +495,17 @@ def print_tables(panels):
             print()
 
 
-def plot(panels, record, filename, layout='screen'):
+def plot(record, panels, filename, layout='screen'):
     '''
     Log-log convergence plots: sectors down the rows, families across.
 
     Parameters
     ----------
+    record : dict
+        Record read from a data file; supplies the title.
     panels : list of dict
         Per-family results, as returned by analyse.
-    record : dict
-        Record read from the data file; supplies the title.
-    filename : str
+    filename : str or Path
         Output figure path.
     layout : {'screen', 'print'}, optional
         'screen' (default) draws the panels large under a title; 'print'
@@ -435,15 +525,30 @@ def plot(panels, record, filename, layout='screen'):
     fig, axes = plt.subplots(2, n_fam, figsize=figsize,
                              squeeze=False, sharex='col', sharey='row')
 
+    # Guide at the nominal order, set below every curve so it reads as a
+    # guide rather than overplotting a method.
+    guide_lines = {}
+    for col, panel in enumerate(panels):
+        dt = panel['dt']
+        for key, _ in SECTORS:
+            lowest = min(panel['methods'][n][key][-1] for n in panel['names'])
+            guide_lines[col, key] = (
+                0.2 * lowest * (dt / dt[-1]) ** panel['order'])
+
     # A common vertical range per row keeps the two families on the same
     # scale, so the gap between second and fourth order reads directly
-    # off the figure.
+    # off the figure. The range covers the guides as well as the data,
+    # with three times matplotlib's default headroom, so the guide labels
+    # have room below the guides.
     limits = {}
     for key, _ in SECTORS:
-        vals = np.concatenate([p['methods'][n][key]
-                               for p in panels for n in p['names']])
-        limits[key] = (0.1 * vals.min(), 5.0 * vals.max())
+        vals = np.log10(np.concatenate(
+            [p['methods'][n][key] for p in panels for n in p['names']]
+            + [guide_lines[col, key] for col in range(n_fam)]))
+        pad = 0.15 * (vals.max() - vals.min())
+        limits[key] = (10 ** (vals.min() - pad), 10 ** (vals.max() + pad))
 
+    guides = []
     for col, panel in enumerate(panels):
         dt, slope = panel['dt'], panel['order']
         for row, (key, sector) in enumerate(SECTORS):
@@ -452,32 +557,29 @@ def plot(panels, record, filename, layout='screen'):
                 ls, marker, colour = styles[name]
                 ax.loglog(dt, panel['methods'][name][key], ls=ls,
                           marker=marker, color=colour, label=name)
-            # Guide at the nominal order, set below every curve so it
-            # reads as a guide rather than overplotting a method.
-            lowest = min(panel['methods'][n][key][-1] for n in panel['names'])
-            guide = 0.2 * lowest * (dt / dt[-1]) ** slope
-            ax.plot(dt, guide, ls='--', color='k',
-                    label=rf'$O\left(\Delta t^{{{slope}}}\right)$')
+            guide = guide_lines[col, key]
+            guide_label = rf'$O\left(\Delta t^{{{slope}}}\right)$'
+            ax.plot(dt, guide, ls='--', color='0.5', label=guide_label)
+            guides.append((ax, guide_label, dt, guide))
             ax.set_xscale('log', base=2)
             ax.set_yscale('log')
             ax.set_ylim(*limits[key])
             if col == 0:
-                ax.set_ylabel(f'Estimated {sector} error')
+                ax.set_ylabel(rf'Estimated $\|{key}_N - {key}(T)\|_2$')
             ax.set_title(f'{sector.capitalize()} ({panel["label"]})')
-            # Opaque rather than translucent, which EPS cannot store.
-            ax.grid(True, which='both', color='0.9')
             if layout != 'print':
                 ax.legend(loc='lower right')
 
     if layout == 'print':
-        # One legend under the figure rather than one per panel, which
-        # would cover the data at print size; the column titles give the
-        # nominal order of the dashed guide. Entries are gathered from
-        # every panel, in case the families list different methods.
+        # Panels are labelled by letter alone; the caption describes them.
         for i, ax in enumerate(axes.flat):
-            ax.set_title(f'({chr(ord("a") + i)}) {ax.get_title()}')
+            ax.set_title(f'({chr(ord("a") + i)})')
         for ax in axes[-1]:
             ax.set_xlabel(r'$\Delta t$')
+        # One legend for the methods under the figure rather than one per
+        # panel, which would cover the data at print size. Entries are
+        # gathered from every panel, in case the families list different
+        # methods.
         entries = {}
         for ax in axes.flat:
             for handle, label in zip(*ax.get_legend_handles_labels()):
@@ -485,12 +587,15 @@ def plot(panels, record, filename, layout='screen'):
                     entries.setdefault(label, handle)
         labels = [name for name in styles if name in entries]
         handles = [entries[name] for name in labels]
-        handles.append(axes[0][0].get_lines()[-1])
-        labels.append('Nominal order')
         legend_height = 0.5
         fig.tight_layout(rect=(0, legend_height / fig.get_figheight(), 1, 1))
         fig.legend(handles, labels, loc='lower center', ncol=3,
                    frameon=False)
+        # Each guide is labelled on its panel, since its slope differs
+        # between columns and so cannot share one legend entry.
+        renderer = fig.canvas.get_renderer()
+        for ax, text, x, y in guides:
+            place_label(ax, text, x, y, renderer)
     else:
         experiment = record.get('experiment')
         # 'parameters' is optional in the file contract, like
@@ -505,9 +610,9 @@ def plot(panels, record, filename, layout='screen'):
         fig.supxlabel(r'$\Delta t$')
         fig.tight_layout()
     # Print figures keep their exact width; screen ones are cropped.
-    fig.savefig(filename, dpi=150,
+    fig.savefig(filename,
                 bbox_inches=None if layout == 'print' else 'tight')
-    print(f'Saved convergence plot to {filename}')
+    print(f'Saved {filename}')
     return fig
 
 
@@ -565,9 +670,8 @@ def main():
             continue
         print(f'\n{path}')
         panels = analyse(record)
-        print()
-        print_tables(panels)
-        plt.close(plot(panels, record, output, layout))
+        print_tables(record, panels)
+        plt.close(plot(record, panels, output, layout))
     if failed:
         raise SystemExit(f'{failed} file(s) skipped')
 
