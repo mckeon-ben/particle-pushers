@@ -239,6 +239,10 @@ installation with the `helvet` and `sansmath` packages. Set
 `USETEX = False` at the top of the script to use matplotlib's own
 renderer instead.
 
+Add `--print` to draw a figure at its final size for the *Journal of
+Scientific Computing*, as EPS; the `PRINT_*` settings at the top of the
+script hold that journal's width, lettering and line sizes.
+
 ## Package layout
 
 ```text

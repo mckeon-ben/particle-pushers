@@ -13,10 +13,11 @@ decades faster than a second-order one over the same range, so a
 single shared list tends to leave one family pre-asymptotic while the
 other has already reached the round-off floor.
 
-Optional 'experiment' names the problem in the figure title, and
-'parameters' may carry 'T', the final lab time, which is appended to
-it. Anything else in the file is ignored. Display names not listed in
-STYLES get a style from a fallback cycle rather than raising.
+Optional 'experiment' names the problem in the figure title of the
+screen layout, and 'parameters' may carry 'T', the final lab time, which
+is appended to it. Anything else in the file is ignored. Display names
+not listed in STYLES get a style from a fallback cycle rather than
+raising.
 
 From final states to errors
 ---------------------------
@@ -73,6 +74,16 @@ PLOT_DIR = Path(__file__).resolve().parent / 'plots'
 # to override; matplotlib picks the writer from the suffix.
 FIGURE_SUFFIX = '.pdf'
 
+# Print layout for the Journal of Scientific Computing, used with
+# --print. The figure is drawn at the full text width, 174 mm, so no text
+# or line is scaled down: lettering of 8 to 12 pt in Helvetica, lines of
+# at least 0.3 pt, and vector EPS with the fonts embedded. At 10 pt the
+# superscripts in the tick labels stay close to the 8 pt minimum.
+PRINT_WIDTH = 174 / 25.4
+PRINT_FONT_SIZE = 10
+PRINT_LINE_WIDTH = 1.0
+PRINT_SUFFIX = '.eps'
+
 # Here, matplotlib takes the first entry actually installed, so a machine
 # with the real fonts uses them and one without still produces the same
 # metrics.
@@ -104,9 +115,11 @@ plt.rcParams.update({
     'mathtext.it': 'sans:italic',
     'mathtext.bf': 'sans:bold',
     'mathtext.cal': 'sans',
-    # Embed TrueType rather than the Type 3 fonts matplotlib writes into
-    # PDFs by default.
+    'legend.fontsize': 8,
+    # Embed TrueType rather than the Type 3 fonts matplotlib writes by
+    # default.
     'pdf.fonttype': 42,
+    'ps.fonttype': 42,
 })
 
 
@@ -126,6 +139,32 @@ def use_latex(enabled=USETEX):
     plt.rcParams.update({
         'text.usetex': enabled,
         'text.latex.preamble': LATEX_PREAMBLE if enabled else '',
+    })
+
+
+def use_print_layout():
+    '''
+    Switch to the journal's print sizes for text and lines.
+
+    All text is set at PRINT_FONT_SIZE and every line, including the
+    axes, ticks and grid, at PRINT_LINE_WIDTH.
+    '''
+    size, width = PRINT_FONT_SIZE, PRINT_LINE_WIDTH
+    plt.rcParams.update({
+        'font.size': size,
+        'axes.titlesize': size,
+        'axes.labelsize': size,
+        'xtick.labelsize': size,
+        'ytick.labelsize': size,
+        'legend.fontsize': size,
+        'lines.linewidth': width,
+        'axes.linewidth': width,
+        'grid.linewidth': width,
+        'xtick.major.width': width,
+        'ytick.major.width': width,
+        'xtick.minor.width': width,
+        'ytick.minor.width': width,
+        'lines.markersize': 3.5,
     })
 
 
@@ -366,7 +405,7 @@ def print_tables(panels):
             print()
 
 
-def plot(panels, record, filename):
+def plot(panels, record, filename, layout='screen'):
     '''
     Log-log convergence plots: sectors down the rows, families across.
 
@@ -378,6 +417,11 @@ def plot(panels, record, filename):
         Record read from the data file; supplies the title.
     filename : str
         Output figure path.
+    layout : {'screen', 'print'}, optional
+        'screen' (default) draws the panels large under a title; 'print'
+        draws them at the journal width, labelled (a), (b), ..., with one
+        legend below and no figure title, since the caption belongs to
+        the paper.
 
     Returns
     -------
@@ -386,7 +430,9 @@ def plot(panels, record, filename):
     '''
     styles = assign_styles(panels)
     n_fam = len(panels)
-    fig, axes = plt.subplots(2, n_fam, figsize=(6.2 * n_fam, 9.6),
+    figsize = ((PRINT_WIDTH, 0.8 * PRINT_WIDTH) if layout == 'print'
+               else (6.2 * n_fam, 9.6))
+    fig, axes = plt.subplots(2, n_fam, figsize=figsize,
                              squeeze=False, sharex='col', sharey='row')
 
     # A common vertical range per row keeps the two families on the same
@@ -418,22 +464,49 @@ def plot(panels, record, filename):
             if col == 0:
                 ax.set_ylabel(f'Estimated {sector} error')
             ax.set_title(f'{sector.capitalize()} ({panel["label"]})')
-            ax.grid(True, which='both', alpha=0.3)
-            ax.legend(fontsize=8, loc='lower right')
+            # Opaque rather than translucent, which EPS cannot store.
+            ax.grid(True, which='both', color='0.9')
+            if layout != 'print':
+                ax.legend(loc='lower right')
 
-    experiment = record.get('experiment')
-    # 'parameters' is optional in the file contract, like
-    # 'experiment', so reach for T defensively rather than
-    # indexing: a record without it still plots, just untitled.
-    final_time = record.get('parameters', {}).get('T')
-    title = 'Richardson self-convergence'
-    parts = [experiment] if experiment else [title]
-    if final_time is not None:
-        parts.append(rf'$(T_{{\mathrm{{end}}}} = {final_time:g})$')
-    fig.suptitle(' '.join(parts))
-    fig.supxlabel(r'$\Delta t$')
-    fig.tight_layout()
-    fig.savefig(filename, dpi=150, bbox_inches='tight')
+    if layout == 'print':
+        # One legend under the figure rather than one per panel, which
+        # would cover the data at print size; the column titles give the
+        # nominal order of the dashed guide. Entries are gathered from
+        # every panel, in case the families list different methods.
+        for i, ax in enumerate(axes.flat):
+            ax.set_title(f'({chr(ord("a") + i)}) {ax.get_title()}')
+        for ax in axes[-1]:
+            ax.set_xlabel(r'$\Delta t$')
+        entries = {}
+        for ax in axes.flat:
+            for handle, label in zip(*ax.get_legend_handles_labels()):
+                if label in styles:
+                    entries.setdefault(label, handle)
+        labels = [name for name in styles if name in entries]
+        handles = [entries[name] for name in labels]
+        handles.append(axes[0][0].get_lines()[-1])
+        labels.append('Nominal order')
+        legend_height = 0.5
+        fig.tight_layout(rect=(0, legend_height / fig.get_figheight(), 1, 1))
+        fig.legend(handles, labels, loc='lower center', ncol=3,
+                   frameon=False)
+    else:
+        experiment = record.get('experiment')
+        # 'parameters' is optional in the file contract, like
+        # 'experiment', so reach for T defensively rather than
+        # indexing: a record without it still plots, just untitled.
+        final_time = record.get('parameters', {}).get('T')
+        title = 'Richardson self-convergence'
+        parts = [experiment] if experiment else [title]
+        if final_time is not None:
+            parts.append(rf'$(T_{{\mathrm{{end}}}} = {final_time:g})$')
+        fig.suptitle(' '.join(parts))
+        fig.supxlabel(r'$\Delta t$')
+        fig.tight_layout()
+    # Print figures keep their exact width; screen ones are cropped.
+    fig.savefig(filename, dpi=150,
+                bbox_inches=None if layout == 'print' else 'tight')
     print(f'Saved convergence plot to {filename}')
     return fig
 
@@ -456,10 +529,17 @@ def main():
                              f'{DATA_DIR}/')
     parser.add_argument('-o', '--output', default=None,
                         help=f'output figure (default: {PLOT_DIR}/<name>'
-                             f'{FIGURE_SUFFIX})')
+                             f'{FIGURE_SUFFIX}, or {PRINT_SUFFIX} with '
+                             f'--print)')
+    parser.add_argument('--print', action='store_true', dest='print_layout',
+                        help='draw at the print size of the journal')
     args = parser.parse_args()
 
     use_latex()
+    layout, suffix = 'screen', FIGURE_SUFFIX
+    if args.print_layout:
+        use_print_layout()
+        layout, suffix = 'print', PRINT_SUFFIX
 
     files = ([resolve(name) for name in args.results] if args.results
              else find_all())
@@ -473,7 +553,7 @@ def main():
     failed = 0
     for path in files:
         output = args.output or str(
-            PLOT_DIR / (path.stem + FIGURE_SUFFIX))
+            PLOT_DIR / (path.stem + suffix))
         try:
             record = load(path)
         except (ValueError, KeyError) as exc:
@@ -487,7 +567,7 @@ def main():
         panels = analyse(record)
         print()
         print_tables(panels)
-        plt.close(plot(panels, record, output))
+        plt.close(plot(panels, record, output, layout))
     if failed:
         raise SystemExit(f'{failed} file(s) skipped')
 

@@ -73,7 +73,7 @@ X_START = np.array([0.9, 0.0, 0.0])
 U_START = np.array([0.1, 0.0, 0.0])
 Q, M = 1.0, 1.0
 
-# Final lab time, about thirty-eight gyroperiods.
+# Final lab time.
 T = 256.0
 
 
