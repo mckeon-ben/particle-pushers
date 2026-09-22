@@ -60,6 +60,7 @@ class Pusher(ABC):
     Concrete pushers are instantiated directly rather than through
     the base class:
 
+    >>> from particle_pushers import Boris, Particle, StaticField
     >>> field = StaticField(B_func=lambda x: np.array([0., 0., 1.]))
     >>> particle = Particle(x=np.array([1., 0., 0.]),
     ...                     u=np.array([0., 1., 0.]),
