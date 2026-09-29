@@ -265,7 +265,7 @@ class TimeDependentField(Field):
 
     Examples
     --------
-    Plane wave propagating in the z-direction, polarised in x
+    Plane wave propagating in the z-direction, polarized in x
     (with omega = k = 1.0 in natural units where c = 1):
 
     >>> omega, k, E0 = 1.0, 1.0, 0.1

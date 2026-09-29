@@ -82,7 +82,7 @@ T = 32.0
 
 def plane_wave_field(a0=A0, omega=OMEGA):
     '''
-    Monochromatic linearly polarised wave along x, polarised along y.
+    Monochromatic linearly polarized wave along x, polarized along y.
 
     Parameters
     ----------

@@ -48,7 +48,7 @@ class Hairer(Pusher):
     of the 4-position vector.
 
     Positions are stored at integer proper time steps and velocities
-    at half-integer proper time steps. The stagger operator initialises
+    at half-integer proper time steps. The stagger operator initializes
     the scheme by advancing the velocity by half a time step and the
     position by a full time step before the main iteration begins.
 
@@ -97,7 +97,7 @@ class Hairer(Pusher):
         Stagger the position and velocity by half a time step.
 
         Advances the 4-velocity by a half proper time step and the
-        4-position by a full proper time step to initialise the
+        4-position by a full proper time step to initialize the
         staggered leapfrog scheme. The zeroth component of the
         4-velocity is updated to ensure Lorentz invariance.
 
@@ -455,7 +455,7 @@ class HairerVariational(Hairer):
     Hairer-Lubich-Shi variational leapfrog pusher.
 
     Implements the variational leapfrog integrator derived from the
-    discrete Euler-Lagrange equations of a discretised action integral.
+    discrete Euler-Lagrange equations of a discretized action integral.
     The method adds a correction term involving the Jacobian of the
     4-potential and a finite difference of the 4-potential to the
     explicit Hairer update.

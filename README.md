@@ -21,7 +21,7 @@ quantities are in natural units with *c* = 1.
 - [Things to know](#things-to-know)
 - [Examples](#examples)
 - [Package layout](#package-layout)
-- [Licence](#licence)
+- [License](#license)
 - [References](#references)
 
 ## Installation
@@ -221,7 +221,7 @@ final states to JSON:
 | `harmonic_well.py`      | Harmonic electrostatic well in an axial field   |
 | `magnetic_mirror.py`    | Axisymmetric magnetic mirror                    |
 | `planar_undulator.py`   | Planar undulator, an exact vacuum field         |
-| `plane_wave.py`         | Linearly polarised monochromatic plane wave     |
+| `plane_wave.py`         | Linearly polarized monochromatic plane wave     |
 
 `plotting.py` turns the data files into error estimates, observed
 orders and convergence figures. The scripts can be run from any
@@ -270,7 +270,7 @@ examples/
     plotting.py            error estimates and figures
 ```
 
-## Licence
+## License
 
 MIT; see [LICENSE](LICENSE).
 

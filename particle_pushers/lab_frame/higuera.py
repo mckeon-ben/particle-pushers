@@ -28,7 +28,7 @@ class Higuera(Pusher):
     and correctly captures the E x B drift velocity. The velocity update
     uses a relativistic correction to the rotation angle computed from
     the half-accelerated momentum, combining the structure-preserving
-    property of Boris with the correct drift behaviour of Vay.
+    property of Boris with the correct drift behavior of Vay.
 
     Notes
     -----

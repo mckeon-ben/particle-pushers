@@ -81,8 +81,8 @@ Q, M = 1.0, 1.0
 # Launch state, derived rather than written out so that it stays
 # consistent with the geometry above: the particle starts at the
 # midplane one gyroradius off axis, with the sign of u_perp chosen so
-# the magnetic force points back towards the axis, which puts the
-# guiding centre on it. Trapping needs sin(PITCH)**2 above the inverse
+# the magnetic force points back toward the axis, which puts the
+# guiding center on it. Trapping needs sin(PITCH)**2 above the inverse
 # mirror ratio 1/(1 + ALPHA); at PITCH = pi/3, ALPHA = 3 that is 0.75
 # against 0.25.
 X_START = np.array([U_MAG * np.sin(PITCH) / B0, 0.0, 0.0])
@@ -100,7 +100,7 @@ def mirror_field(b0=B0, alpha=ALPHA):
     Parameters
     ----------
     b0 : float, optional
-        Field strength at the centre, which sets the gyrofrequency.
+        Field strength at the center, which sets the gyrofrequency.
     alpha : float, optional
         Axial curvature; the mirror ratio at |z| = 1 is 1 + alpha.
 

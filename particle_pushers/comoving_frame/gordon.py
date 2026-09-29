@@ -338,7 +338,7 @@ class LabTimeConversion:
     The base Gordon ``_step(x, u, dtau)`` treats ``dtau`` as a proper-time
     step and lets lab time accrue passively in the zeroth component of the
     4-position. This mixin instead takes a controlled lab-time step
-    ``dt_lab`` and solves for the proper-time step ``dtau`` that realises it,
+    ``dt_lab`` and solves for the proper-time step ``dtau`` that realizes it,
     so that ``solve((0, T), N)`` advances N equal lab-time steps and is
     directly comparable to the native lab-frame pushers (Boris, etc.).
 
@@ -387,7 +387,7 @@ class LabTimeConversion:
         u : np.ndarray
             Current 4-velocity, shape (4,).
         dt_lab : float
-            Lab-time step to realise.
+            Lab-time step to realize.
 
         Returns
         -------
@@ -424,7 +424,7 @@ class LabTimeConversion:
         Advance the particle state by one controlled lab time step.
 
         Overrides the proper-time ``advance`` of the underlying Gordon
-        pusher, so that ``dt`` is a lab-time increment realised by
+        pusher, so that ``dt`` is a lab-time increment realized by
         solving the trapezoidal conversion for the corresponding
         proper-time step.
 
@@ -435,7 +435,7 @@ class LabTimeConversion:
             ignored; lab time is carried in the zeroth component of
             the 4-position.
         dt : float
-            Lab time step to realise.
+            Lab time step to realize.
 
         Returns
         -------

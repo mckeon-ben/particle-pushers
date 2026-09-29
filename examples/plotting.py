@@ -45,7 +45,7 @@ rather than as log2 of the difference ratio. The two agree when the step
 is exactly halved, but the general form does not silently misreport when
 it is not: a step list that doubles everywhere except once, as a typo
 easily produces, would otherwise show an order error of about half a per
-cent at the affected pair and look like real behaviour.
+cent at the affected pair and look like real behavior.
 '''
 
 import argparse
@@ -182,7 +182,7 @@ STYLES = {
     'Gordon-Hafizi (exact)': ('-', 'D'),
 }
 
-# Okabe-Ito, the standard colourblind-safe qualitative palette.
+# Okabe-Ito, the standard colorblind-safe qualitative palette.
 PALETTE = [
     '#0072B2',  # blue
     '#D55E00',  # vermillion
@@ -287,22 +287,22 @@ def load(filename):
 
 def assign_styles(panels):
     '''
-    Line style, marker and colour for every display name.
+    Line style, marker and color for every display name.
 
     Assigned across all families at once, because matplotlib restarts
-    its colour cycle on each new axes: without this a method would
-    change colour between columns as soon as two families stopped
+    its color cycle on each new axes: without this a method would
+    change color between columns as soon as two families stopped
     listing the same names in the same order.
 
     Parameters
     ----------
     panels : list of dict
-        Per-family results, as returned by analyse.
+        Per-family results, as returned by analyze.
 
     Returns
     -------
     dict
-        Display name -> (line style, marker, colour).
+        Display name -> (line style, marker, color).
     '''
     names = []
     for panel in panels:
@@ -343,7 +343,7 @@ def place_label(ax, text, x, y, renderer, side='below'):
         Renderer used to measure the label.
     side : {'below', 'above'}, optional
         Side of the guide tried first; the one away from the data, so
-        the label cannot be read as labelling a curve. Default 'below'.
+        the label cannot be read as labeling a curve. Default 'below'.
 
     Returns
     -------
@@ -433,7 +433,7 @@ def differences(states, dt, order):
     return delta, orders
 
 
-def analyse(record):
+def analyze(record):
     '''
     Errors and orders for every method in every family.
 
@@ -475,7 +475,7 @@ def print_tables(record, panels):
     record : dict
         Record read from a data file; supplies the heading.
     panels : list of dict
-        Per-family results, as returned by analyse.
+        Per-family results, as returned by analyze.
     '''
     print(f'\n{record.get("experiment", "Richardson self-convergence")}')
     for panel in panels:
@@ -504,12 +504,12 @@ def plot(record, panels, filename, layout='screen'):
     record : dict
         Record read from a data file; supplies the title.
     panels : list of dict
-        Per-family results, as returned by analyse.
+        Per-family results, as returned by analyze.
     filename : str or Path
         Output figure path.
     layout : {'screen', 'print'}, optional
         'screen' (default) draws the panels large under a title; 'print'
-        draws them at the journal width, labelled (a), (b), ..., with one
+        draws them at the journal width, labeled (a), (b), ..., with one
         legend below and no figure title, since the caption belongs to
         the paper.
 
@@ -554,9 +554,9 @@ def plot(record, panels, filename, layout='screen'):
         for row, (key, sector) in enumerate(SECTORS):
             ax = axes[row][col]
             for name in panel['names']:
-                ls, marker, colour = styles[name]
+                ls, marker, color = styles[name]
                 ax.loglog(dt, panel['methods'][name][key], ls=ls,
-                          marker=marker, color=colour, label=name)
+                          marker=marker, color=color, label=name)
             guide = guide_lines[col, key]
             guide_label = rf'$O\left(\Delta t^{{{slope}}}\right)$'
             ax.plot(dt, guide, ls='--', color='0.5', label=guide_label)
@@ -571,7 +571,7 @@ def plot(record, panels, filename, layout='screen'):
                 ax.legend(loc='lower right')
 
     if layout == 'print':
-        # Panels are labelled by letter alone; the caption describes them.
+        # Panels are labeled by letter alone; the caption describes them.
         for i, ax in enumerate(axes.flat):
             ax.set_title(f'({chr(ord("a") + i)})')
         for ax in axes[-1]:
@@ -591,7 +591,7 @@ def plot(record, panels, filename, layout='screen'):
         fig.tight_layout(rect=(0, legend_height / fig.get_figheight(), 1, 1))
         fig.legend(handles, labels, loc='lower center', ncol=3,
                    frameon=False)
-        # Each guide is labelled on its panel, since its slope differs
+        # Each guide is labeled on its panel, since its slope differs
         # between columns and so cannot share one legend entry.
         renderer = fig.canvas.get_renderer()
         for ax, text, x, y in guides:
@@ -669,7 +669,7 @@ def main():
             failed += 1
             continue
         print(f'\n{path}')
-        panels = analyse(record)
+        panels = analyze(record)
         print_tables(record, panels)
         plt.close(plot(record, panels, output, layout))
     if failed:

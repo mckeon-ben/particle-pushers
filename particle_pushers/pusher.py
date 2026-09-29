@@ -230,7 +230,7 @@ class PusherOrderFour(Pusher):
         Defaults to the concrete pusher's ``_step``, dispatching on the
         ``_lab_time`` signature. Subclasses may override to route the Yoshida
         composition through a wrapped step (for example, a lab-time conversion
-        that solves for the proper-time increment realising each weighted
+        that solves for the proper-time increment realizing each weighted
         lab-time sub-step). The ``t_n`` argument is accepted for signature
         uniformity and ignored by comoving-frame steps.
 
