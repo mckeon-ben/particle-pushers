@@ -6,7 +6,8 @@ File contract
 -------------
 Required: 'schema' and 'families'. Each family carries 'label',
 'order', 'method_order', 'methods' -- the last mapping each display
-name to 'x' and 'u' arrays holding one final state per entry of dt --
+name to 'time', the seconds that method took, and 'x' and 'u' arrays
+holding one final state per entry of dt --
 and its own 'dt', the step sizes those states were computed at. Steps
 are per family because a fourth-order method's error falls four
 decades faster than a second-order one over the same range, so a

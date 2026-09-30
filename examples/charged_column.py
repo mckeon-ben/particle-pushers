@@ -234,8 +234,8 @@ def run_family(field, x0_3, u0_3, q, m, T, n_list, lab_methods,
     -------
     dict
         Keys 'label', 'order', 'dt', 'method_order' and 'methods', the
-        last mapping each display name to its class, frame and final
-        'x' and 'u' states.
+        last mapping each display name to its class, frame, the seconds
+        it took, and final 'x' and 'u' states.
     '''
     gamma0 = np.sqrt(1.0 + u0_3 @ u0_3)
     x0_4 = np.hstack([0.0, x0_3])
@@ -248,13 +248,15 @@ def run_family(field, x0_3, u0_3, q, m, T, n_list, lab_methods,
         x0, u0 = (x0_4, u0_4) if is_gordon else (x0_3, u0_3)
         t0 = time.perf_counter()
         xs, us = run_method(cls, x0, u0, q, m, field, T, n_list, is_gordon)
+        elapsed = time.perf_counter() - t0
         methods[name] = {
             'class': cls.__name__,
             'frame': 'comoving' if is_gordon else 'lab',
+            'time': round(elapsed, 3),
             'x': xs.tolist(), 'u': us.tolist(),
         }
         print(f'  {label:>9s}  {name:<28s} {cls.__name__:<28s} '
-              f'{time.perf_counter() - t0:6.1f}s', flush=True)
+              f'{elapsed:6.1f}s', flush=True)
 
     return {'label': label, 'order': order,
             'dt': [T / N for N in n_list],
