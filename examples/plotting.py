@@ -467,6 +467,27 @@ def analyze(record):
     return panels
 
 
+def step_label(h):
+    '''
+    Label a step size, as a power of two where it is one.
+
+    The step counts are powers of two, so the labels match the ticks of
+    the step-size axis and stay short.
+
+    Parameters
+    ----------
+    h : float
+        Step size.
+
+    Returns
+    -------
+    str
+        Label such as '2^-9', or two significant figures otherwise.
+    '''
+    k = np.log2(h)
+    return f'2^{round(k):d}' if abs(k - round(k)) < 1e-9 else f'{h:.2e}'
+
+
 def print_tables(record, panels):
     '''
     Print the estimated errors and observed orders for every family.
@@ -480,19 +501,24 @@ def print_tables(record, panels):
     '''
     print(f'\n{record.get("experiment", "Richardson self-convergence")}')
     for panel in panels:
-        print('#' * 78)
+        names = panel['names']
+        width = max(len(name) for name in names)
+        header = (f'{"Method":>{width}} |'
+                  + ''.join(f'{step_label(d):>9}' for d in panel['dt']))
+        print('#' * len(header))
         print(f'# {panel["label"]} methods')
-        print('#' * 78)
-        header = (f'{"Method":>28} | '
-                  + ' '.join(f'{f"dt={d:.5f}":>11}' for d in panel['dt']))
+        print('#' * len(header))
         for key, sector in SECTORS:
             print(f'Estimated {sector} error and observed orders')
             print(header)
-            for name in panel['names']:
+            for name in names:
                 m = panel['methods'][name]
-                row = ' '.join(f'{d:>11.3e}' for d in m[key])
-                orders = ','.join(f'{o:.2f}' for o in m[key + '_order'])
-                print(f'{name:>28} | {row}   order: {orders}')
+                print(f'{name:>{width}} |'
+                      + ''.join(f'{d:>9.2e}' for d in m[key]))
+                # Each observed order belongs to a pair of step sizes,
+                # and is written under the finer of the two.
+                print(f'{"order":>{width}} |' + ' ' * 9
+                      + ''.join(f'{o:>9.2f}' for o in m[key + '_order']))
             print()
 
 
