@@ -15,7 +15,8 @@ single shared list tends to leave one family pre-asymptotic while the
 other has already reached the round-off floor.
 
 Optional 'experiment' heads the printed tables, and 'parameters' may
-carry 'T', the final lab time, which is named on the step-size axis.
+carry 'T', the final lab time, which is named in the corner of the
+first panel of each row.
 Anything else in the file is ignored. Display names not listed in
 STYLES get a style from a fallback cycle rather than raising.
 
@@ -129,18 +130,19 @@ DEFAULT_FONTS = ['DejaVu Sans']
 LAYOUTS = {
     'journal': {'width': JOURNAL_WIDTH, 'font_size': 10, 'line_width': 1.0,
                 'suffix': '-journal.eps', 'usetex': True,
-                'preamble': SANS_PREAMBLE, 'fonts': SANS_FONTS,
-                'mathtext': 'custom',
+                'preamble': SANS_PREAMBLE, 'family': 'sans-serif',
+                'fonts': SANS_FONTS, 'mathtext': 'custom',
                 # Set the maths in the same family as the text.
                 'rc': {'mathtext.rm': 'sans', 'mathtext.it': 'sans:italic',
                        'mathtext.bf': 'sans:bold', 'mathtext.cal': 'sans'}},
     'thesis': {'width': THESIS_WIDTH, 'font_size': 10, 'line_width': 1.0,
                'suffix': '-thesis.pdf', 'usetex': True,
-               'preamble': CM_PREAMBLE, 'fonts': CM_FONTS,
-               'mathtext': 'cm'},
+               'preamble': CM_PREAMBLE, 'family': 'serif',
+               'fonts': CM_FONTS, 'mathtext': 'cm'},
     'default': {'width': DEFAULT_WIDTH, 'font_size': 10, 'line_width': 1.0,
                 'suffix': '.pdf', 'usetex': False, 'preamble': '',
-                'fonts': DEFAULT_FONTS, 'mathtext': 'dejavusans'},
+                'family': 'sans-serif', 'fonts': DEFAULT_FONTS,
+                'mathtext': 'dejavusans'},
 }
 
 # The figure is this many times as tall as it is wide, so its panels
@@ -165,9 +167,11 @@ def use_layout(name):
     '''
     Set the lettering, line widths and renderer of one layout.
 
-    Under usetex the font and mathtext settings are ignored, since the
-    preamble decides both; they stay in place as the fallback for the
-    layout that does without LaTeX.
+    The family is read whether or not LaTeX is in use: under usetex it
+    chooses the font declaration, and the preamble refines it. What
+    the fonts behind that family are, and the mathtext set, matter
+    only to the layout that does without LaTeX, since there the
+    preamble has no say.
 
     Parameters
     ----------
@@ -184,7 +188,12 @@ def use_layout(name):
     plt.rcParams.update({
         'text.usetex': layout['usetex'],
         'text.latex.preamble': layout['preamble'],
-        'font.family': layout['fonts'],
+        # Naming the generic family, not the fonts behind it: under
+        # usetex matplotlib reads its LaTeX font declaration from this
+        # alone, and falls back to Computer Modern for anything it does
+        # not recognise as a family.
+        'font.family': layout['family'],
+        f'font.{layout["family"]}': layout['fonts'],
         'mathtext.fontset': layout['mathtext'],
         'axes.formatter.use_mathtext': True,
         'font.size': size,
@@ -633,15 +642,30 @@ def plot(record, panels, filename, layout='default'):
     # Panels are labeled by letter alone; the caption describes them.
     for i, ax in enumerate(axes.flat):
         ax.set_title(f'({chr(ord("a") + i)})')
-    # The final time the errors were measured at is named on the axis
-    # rather than in a title. 'parameters' is optional in the file
-    # contract, so reach for T defensively rather than indexing: a
-    # record without it still plots, just without the time on the axis.
-    final_time = record.get('parameters', {}).get('T')
-    step = r'$\Delta t$' if final_time is None else \
-        rf'$\Delta t$, $T = {final_time:.4g}$'
     for ax in axes[-1]:
-        ax.set_xlabel(step)
+        ax.set_xlabel(r'$\Delta t$')
+    # The final time the errors were measured at is one number for the
+    # whole figure, so it is stated in the corner of the first panel of
+    # each row rather than repeated under every column. The box is
+    # opaque rather than translucent, which EPS cannot store, and it
+    # sits bottom left: the guides are set below every curve, so the
+    # room beneath them is the clearest on the panel by some way, and
+    # the guide's own label is placed to the right of there. It is held
+    # off the frame by an offset in points rather than in axes
+    # fractions, so the gap is the same whatever the panel is shaped
+    # like. 'parameters' is optional in the file contract, so reach for
+    # T defensively rather than indexing: a record without it still
+    # plots, just without the time on it.
+    final_time = record.get('parameters', {}).get('T')
+    if final_time is not None:
+        for row in axes:
+            row[0].annotate(rf'$T = {final_time:.4g}$',
+                            xy=(0, 0), xycoords='axes fraction',
+                            xytext=(10, 10), textcoords='offset points',
+                            ha='left', va='bottom',
+                            bbox={'boxstyle': 'round,pad=0.4',
+                                  'facecolor': 'white', 'edgecolor': '0.7',
+                                  'linewidth': plt.rcParams['axes.linewidth']})
     # One legend for the methods under the figure rather than one per
     # panel, which would cover the data. Entries are gathered from
     # every panel, in case the families list different methods.
