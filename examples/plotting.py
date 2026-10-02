@@ -14,11 +14,10 @@ decades faster than a second-order one over the same range, so a
 single shared list tends to leave one family pre-asymptotic while the
 other has already reached the round-off floor.
 
-Optional 'experiment' names the problem in the figure title of the
-screen layout, and 'parameters' may carry 'T', the final lab time, which
-is appended to it. Anything else in the file is ignored. Display names
-not listed in STYLES get a style from a fallback cycle rather than
-raising.
+Optional 'experiment' heads the printed tables, and 'parameters' may
+carry 'T', the final lab time, which is named on the step-size axis.
+Anything else in the file is ignored. Display names not listed in
+STYLES get a style from a fallback cycle rather than raising.
 
 From final states to errors
 ---------------------------
@@ -70,32 +69,31 @@ DATA_DIR = Path(__file__).resolve().parent / 'data'
 # directory holds only inputs and the other only outputs.
 PLOT_DIR = Path(__file__).resolve().parent / 'plots'
 
-# Default output format. Vector, so the figure stays sharp at any zoom
-# and at whatever size a paper puts it. Pass -o with another extension
-# to override; matplotlib picks the writer from the suffix.
-FIGURE_SUFFIX = '.pdf'
+# A figure is drawn for one of three pages, named on the command line.
+# The arrangement is the same in all three -- the panels, their labels
+# and the legend beneath them do not move -- so a figure differs
+# between them only in the width it is drawn at, its lettering, and
+# the renderer that sets the text.
+#
+#   --journal   the text width and typeface of the journal
+#   --thesis    the text width of an A4 thesis, set in Computer
+#               Modern, the body typeface of a LaTeX thesis
+#   neither     matplotlib's own renderer and fonts, which needs no
+#               LaTeX installation, so that anyone can redraw these
+#               figures from the data files
+#
+# Each width is the width the figure is used at, so nothing is scaled
+# afterwards and no lettering shrinks: the journal sets its text at
+# 174 mm, an A4 page with 25 mm margins leaves 160 mm, and
+# matplotlib's own figure is 6.4 in wide. At 10 pt the superscripts in
+# the journal's tick labels stay close to its 8 pt minimum, and its
+# lines clear the 0.3 pt one.
+JOURNAL_WIDTH = 174 / 25.4
+THESIS_WIDTH = 160 / 25.4
+DEFAULT_WIDTH = 6.4
 
-# Print layout for the Journal of Scientific Computing, used with
-# --print. The figure is drawn at the full text width, 174 mm, so no text
-# or line is scaled down: lettering of 8 to 12 pt in Helvetica, lines of
-# at least 0.3 pt, and vector EPS with the fonts embedded. At 10 pt the
-# superscripts in the tick labels stay close to the 8 pt minimum.
-PRINT_WIDTH = 174 / 25.4
-PRINT_FONT_SIZE = 10
-PRINT_LINE_WIDTH = 1.0
-PRINT_SUFFIX = '.eps'
-
-# Here, matplotlib takes the first entry actually installed, so a machine
-# with the real fonts uses them and one without still produces the same
-# metrics.
-FONT_STACK = ['Helvetica', 'Arial', 'TeX Gyre Heros', 'Nimbus Sans',
-              'Liberation Sans', 'FreeSans', 'DejaVu Sans']
-
-# Typeset through a local LaTeX installation instead of matplotlib's own
-# engine.
-USETEX = True
-
-LATEX_PREAMBLE = r'''
+# The journal sets its figures in Helvetica, maths included.
+SANS_PREAMBLE = r'''
 \usepackage[T1]{fontenc}
 \usepackage{helvet}
 \renewcommand{\familydefault}{\sfdefault}
@@ -107,20 +105,55 @@ LATEX_PREAMBLE = r'''
 \DeclareMathSymbol{\Delta}{\mathord}{sansgreek}{"01}
 '''
 
+# Stand-ins for when LaTeX is off. matplotlib takes the first entry
+# actually installed, so a machine with the real fonts uses them and
+# one without still produces the same metrics.
+SANS_FONTS = ['Helvetica', 'Arial', 'TeX Gyre Heros', 'Nimbus Sans',
+              'Liberation Sans', 'FreeSans', 'DejaVu Sans']
+
+# LaTeX sets Computer Modern unless told otherwise, so the thesis page
+# asks for no font package.
+CM_PREAMBLE = ''
+
+# What matplotlib would set the thesis page in were its usetex turned
+# off below: cmr10, with DejaVu Serif behind it for any glyph cmr10
+# lacks.
+CM_FONTS = ['cmr10', 'DejaVu Serif']
+
+# matplotlib's own, so that the figure drawn without a flag is the one
+# its documentation would lead a reader to expect.
+DEFAULT_FONTS = ['DejaVu Sans']
+
+# Each layout ends the figure's name its own way, so that drawing the
+# same data for two pages leaves two files rather than one.
+LAYOUTS = {
+    'journal': {'width': JOURNAL_WIDTH, 'font_size': 10, 'line_width': 1.0,
+                'suffix': '-journal.eps', 'usetex': True,
+                'preamble': SANS_PREAMBLE, 'fonts': SANS_FONTS,
+                'mathtext': 'custom',
+                # Set the maths in the same family as the text.
+                'rc': {'mathtext.rm': 'sans', 'mathtext.it': 'sans:italic',
+                       'mathtext.bf': 'sans:bold', 'mathtext.cal': 'sans'}},
+    'thesis': {'width': THESIS_WIDTH, 'font_size': 10, 'line_width': 1.0,
+               'suffix': '-thesis.pdf', 'usetex': True,
+               'preamble': CM_PREAMBLE, 'fonts': CM_FONTS,
+               'mathtext': 'cm'},
+    'default': {'width': DEFAULT_WIDTH, 'font_size': 10, 'line_width': 1.0,
+                'suffix': '.pdf', 'usetex': False, 'preamble': '',
+                'fonts': DEFAULT_FONTS, 'mathtext': 'dejavusans'},
+}
+
+# The figure is this many times as tall as it is wide, so its panels
+# keep their shape whichever page it is drawn for.
+FIGURE_RATIO = 0.8
+
+# What every layout shares. The fonts and sizes are not here, since
+# those are what the layouts differ in; use_layout sets them.
 plt.rcParams.update({
-    'font.family': 'sans-serif',
-    'font.sans-serif': FONT_STACK,
-    # Set the maths in the same family.
-    'mathtext.fontset': 'custom',
-    'mathtext.rm': 'sans',
-    'mathtext.it': 'sans:italic',
-    'mathtext.bf': 'sans:bold',
-    'mathtext.cal': 'sans',
     'axes.grid': True,
     # Opaque rather than translucent, which EPS cannot store.
     'grid.color': '0.9',
     'figure.dpi': 150,
-    'legend.fontsize': 8,
     # Embed TrueType rather than the Type 3 fonts matplotlib writes by
     # default.
     'pdf.fonttype': 42,
@@ -128,34 +161,32 @@ plt.rcParams.update({
 })
 
 
-def use_latex(enabled=USETEX):
+def use_layout(name):
     '''
-    Switch LaTeX typesetting on or off.
+    Set the lettering, line widths and renderer of one layout.
 
-    Under usetex the mathtext and font.sans-serif settings above are
-    ignored, since the preamble decides both; they stay in place as the
-    fallback for when this is off.
+    Under usetex the font and mathtext settings are ignored, since the
+    preamble decides both; they stay in place as the fallback for the
+    layout that does without LaTeX.
 
     Parameters
     ----------
-    enabled : bool, optional
-        Whether to typeset through LaTeX.
+    name : str
+        Key of LAYOUTS.
+
+    Returns
+    -------
+    dict
+        The layout, whose width and suffix the caller still needs.
     '''
+    layout = LAYOUTS[name]
+    size, width = layout['font_size'], layout['line_width']
     plt.rcParams.update({
-        'text.usetex': enabled,
-        'text.latex.preamble': LATEX_PREAMBLE if enabled else '',
-    })
-
-
-def use_print_layout():
-    '''
-    Switch to the journal's print sizes for text and lines.
-
-    All text is set at PRINT_FONT_SIZE and every line, including the
-    axes, ticks and grid, at PRINT_LINE_WIDTH.
-    '''
-    size, width = PRINT_FONT_SIZE, PRINT_LINE_WIDTH
-    plt.rcParams.update({
+        'text.usetex': layout['usetex'],
+        'text.latex.preamble': layout['preamble'],
+        'font.family': layout['fonts'],
+        'mathtext.fontset': layout['mathtext'],
+        'axes.formatter.use_mathtext': True,
         'font.size': size,
         'axes.titlesize': size,
         'axes.labelsize': size,
@@ -171,6 +202,9 @@ def use_print_layout():
         'ytick.minor.width': width,
         'lines.markersize': 3.5,
     })
+    # Anything a layout needs beyond the settings every layout sets.
+    plt.rcParams.update(layout.get('rc', {}))
+    return layout
 
 
 # Style overrides by display name, so a method keeps its marker across
@@ -522,23 +556,26 @@ def print_tables(record, panels):
             print()
 
 
-def plot(record, panels, filename, layout='screen'):
+def plot(record, panels, filename, layout='default'):
     '''
     Log-log convergence plots: sectors down the rows, families across.
+
+    The panels are labeled (a), (b), ... with one legend below them,
+    whichever layout is in use: a caption carries what a title would
+    say, and the figure then reads the same on every page.
 
     Parameters
     ----------
     record : dict
-        Record read from a data file; supplies the title.
+        Record read from a data file.
     panels : list of dict
         Per-family results, as returned by analyze.
     filename : str or Path
         Output figure path.
-    layout : {'screen', 'print'}, optional
-        'screen' (default) draws the panels large under a title; 'print'
-        draws them at the journal width, labeled (a), (b), ..., with one
-        legend below and no figure title, since the caption belongs to
-        the paper.
+    layout : str, optional
+        Key of LAYOUTS, which fixes the width the figure is drawn at.
+        The lettering and renderer are already in place from
+        use_layout.
 
     Returns
     -------
@@ -547,10 +584,10 @@ def plot(record, panels, filename, layout='screen'):
     '''
     styles = assign_styles(panels)
     n_fam = len(panels)
-    figsize = ((PRINT_WIDTH, 0.8 * PRINT_WIDTH) if layout == 'print'
-               else (6.2 * n_fam, 9.6))
-    fig, axes = plt.subplots(2, n_fam, figsize=figsize,
-                             squeeze=False, sharex='col', sharey='row')
+    page = LAYOUTS[layout]
+    fig, axes = plt.subplots(
+        2, n_fam, figsize=(page['width'], FIGURE_RATIO * page['width']),
+        squeeze=False, sharex='col', sharey='row')
 
     # Guide at the nominal order, set below every curve so it reads as a
     # guide rather than overplotting a method.
@@ -593,52 +630,46 @@ def plot(record, panels, filename, layout='screen'):
             ax.set_ylim(*limits[key])
             if col == 0:
                 ax.set_ylabel(rf'Estimated $\|{key}_N - {key}(T)\|_2$')
-            ax.set_title(f'{sector.capitalize()} ({panel["label"]})')
-            if layout != 'print':
-                ax.legend(loc='lower right')
-
-    if layout == 'print':
-        # Panels are labeled by letter alone; the caption describes them.
-        for i, ax in enumerate(axes.flat):
-            ax.set_title(f'({chr(ord("a") + i)})')
-        for ax in axes[-1]:
-            ax.set_xlabel(r'$\Delta t$')
-        # One legend for the methods under the figure rather than one per
-        # panel, which would cover the data at print size. Entries are
-        # gathered from every panel, in case the families list different
-        # methods.
-        entries = {}
-        for ax in axes.flat:
-            for handle, label in zip(*ax.get_legend_handles_labels()):
-                if label in styles:
-                    entries.setdefault(label, handle)
-        labels = [name for name in styles if name in entries]
-        handles = [entries[name] for name in labels]
-        legend_height = 0.5
-        fig.tight_layout(rect=(0, legend_height / fig.get_figheight(), 1, 1))
-        fig.legend(handles, labels, loc='lower center', ncol=3,
-                   frameon=False)
-        # Each guide is labeled on its panel, since its slope differs
-        # between columns and so cannot share one legend entry.
-        renderer = fig.canvas.get_renderer()
-        for ax, text, x, y in guides:
-            place_label(ax, text, x, y, renderer)
-    else:
-        experiment = record.get('experiment')
-        # 'parameters' is optional in the file contract, like
-        # 'experiment', so reach for T defensively rather than
-        # indexing: a record without it still plots, just untitled.
-        final_time = record.get('parameters', {}).get('T')
-        title = 'Richardson self-convergence'
-        parts = [experiment] if experiment else [title]
-        if final_time is not None:
-            parts.append(rf'$(T_{{\mathrm{{end}}}} = {final_time:g})$')
-        fig.suptitle(' '.join(parts))
-        fig.supxlabel(r'$\Delta t$')
-        fig.tight_layout()
-    # Print figures keep their exact width; screen ones are cropped.
-    fig.savefig(filename,
-                bbox_inches=None if layout == 'print' else 'tight')
+    # Panels are labeled by letter alone; the caption describes them.
+    for i, ax in enumerate(axes.flat):
+        ax.set_title(f'({chr(ord("a") + i)})')
+    # The final time the errors were measured at is named on the axis
+    # rather than in a title. 'parameters' is optional in the file
+    # contract, so reach for T defensively rather than indexing: a
+    # record without it still plots, just without the time on the axis.
+    final_time = record.get('parameters', {}).get('T')
+    step = r'$\Delta t$' if final_time is None else \
+        rf'$\Delta t$, $T = {final_time:.4g}$'
+    for ax in axes[-1]:
+        ax.set_xlabel(step)
+    # One legend for the methods under the figure rather than one per
+    # panel, which would cover the data. Entries are gathered from
+    # every panel, in case the families list different methods.
+    entries = {}
+    for ax in axes.flat:
+        for handle, label in zip(*ax.get_legend_handles_labels()):
+            if label in styles:
+                entries.setdefault(label, handle)
+    labels = [name for name in styles if name in entries]
+    handles = [entries[name] for name in labels]
+    # Three columns, with enough height for the rows they take. The
+    # legend is set a point below the body text, with its handles and
+    # columns drawn in, which keeps three columns of these names
+    # inside even the narrowest of the pages above.
+    ncol = 3
+    legend_height = 0.2 * -(-len(labels) // ncol)
+    fig.tight_layout(rect=(0, legend_height / fig.get_figheight(), 1, 1))
+    fig.legend(handles, labels, loc='lower center', ncol=ncol,
+               frameon=False, fontsize=page['font_size'] - 1,
+               handlelength=1.5, columnspacing=1.0, handletextpad=0.4)
+    # Each guide is labeled on its panel, since its slope differs
+    # between columns and so cannot share one legend entry.
+    renderer = fig.canvas.get_renderer()
+    for ax, text, x, y in guides:
+        place_label(ax, text, x, y, renderer)
+    # Saved at the width it was drawn at, so the figure arrives on the
+    # page at the size its lettering was chosen for.
+    fig.savefig(filename)
     print(f'Saved {filename}')
     return fig
 
@@ -661,17 +692,23 @@ def main():
                              f'{DATA_DIR}/')
     parser.add_argument('-o', '--output', default=None,
                         help=f'output figure (default: {PLOT_DIR}/<name>'
-                             f'{FIGURE_SUFFIX}, or {PRINT_SUFFIX} with '
-                             f'--print)')
-    parser.add_argument('--print', action='store_true', dest='print_layout',
-                        help='draw at the print size of the journal')
+                             f', with the suffix the layout calls for)')
+    # One page at a time, and matplotlib's own when neither is asked
+    # for, which is the layout that needs no LaTeX installation.
+    page = parser.add_mutually_exclusive_group()
+    page.add_argument('--journal', action='store_const', dest='layout',
+                      const='journal',
+                      help='draw at the text width and in the typeface '
+                           'of the journal; needs LaTeX')
+    page.add_argument('--thesis', action='store_const', dest='layout',
+                      const='thesis',
+                      help='draw at the text width of an A4 thesis, in '
+                           'Computer Modern; needs LaTeX')
+    parser.set_defaults(layout='default')
     args = parser.parse_args()
 
-    use_latex()
-    layout, suffix = 'screen', FIGURE_SUFFIX
-    if args.print_layout:
-        use_print_layout()
-        layout, suffix = 'print', PRINT_SUFFIX
+    layout = args.layout
+    suffix = use_layout(layout)['suffix']
 
     files = ([resolve(name) for name in args.results] if args.results
              else find_all())

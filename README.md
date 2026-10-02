@@ -230,18 +230,32 @@ directory: data files always go to `examples/data/` and figures to
 
 ```bash
 python examples/magnetic_mirror.py
-python examples/plotting.py magnetic_mirror    # one data file
-python examples/plotting.py                    # every data file
+python examples/plotting.py magnetic_mirror             # one data file
+python examples/plotting.py                             # every data file
+python examples/plotting.py magnetic_mirror --thesis    # for the thesis
+python examples/plotting.py magnetic_mirror --journal   # for the journal
 ```
 
-`plotting.py` typesets through LaTeX by default, needing an
-installation with the `helvet` and `sansmath` packages. Set
-`USETEX = False` at the top of the script to use matplotlib's own
-renderer instead.
+`plotting.py` draws a figure for one of three pages, and the
+arrangement is the same in all three: the panels, their labels and the
+legend below them do not move, so a figure drawn for the thesis
+differs from the journal one only in its width and its lettering.
 
-Add `--print` to draw a figure at its final size for the *Journal of
-Scientific Computing*, as EPS; the `PRINT_*` settings at the top of the
-script hold that journal's width, lettering and line sizes.
+- No flag: matplotlib's own figure, 6.4 in wide, in DejaVu Sans.
+  Nothing beyond matplotlib is needed, so anyone can redraw these
+  figures from the data files.
+- `--thesis`: the text width of an A4 page with 25 mm margins,
+  160 mm, in Computer Modern, the body typeface of a LaTeX thesis.
+- `--journal`: the text width of the *Journal of Scientific
+  Computing*, 174 mm, in Helvetica, as EPS.
+
+The two LaTeX layouts need a local installation: the `helvet` and
+`sansmath` packages for the journal page, and the `cm-super` fonts for
+the thesis page. Each layout ends the figure's name its own way, so
+drawing the same data for two pages leaves two files rather than one.
+The `LAYOUTS` table at the top of the script holds each page's width,
+lettering and renderer; a thesis class with margins other than 25 mm
+wants its own `\textwidth` in `THESIS_WIDTH`.
 
 ## Package layout
 
