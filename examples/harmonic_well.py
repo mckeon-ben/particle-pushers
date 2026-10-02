@@ -62,7 +62,7 @@ GORDON_METHODS_O4 = {
 # One entry per figure column: label, method sets, nominal order, step counts.
 FAMILIES = [
     ('2nd order', LAB_FRAME_METHODS_O2, GORDON_METHODS_O2, 2,
-     [2048, 4096, 8192, 16384, 32768]),
+     [2048, 4096, 8192, 16384, 32768, 65536]),
     ('4th order', LAB_FRAME_METHODS_O4, GORDON_METHODS_O4, 4,
      [2048, 4096, 8192, 16384, 32768]),
 ]

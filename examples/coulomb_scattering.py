@@ -62,9 +62,9 @@ GORDON_METHODS_O4 = {
 # One entry per figure column: label, method sets, nominal order, step counts.
 FAMILIES = [
     ('2nd order', LAB_FRAME_METHODS_O2, GORDON_METHODS_O2, 2,
-     [16384, 32768, 65536, 131072, 262144]),
+     [16384, 32768, 65536, 131072, 262144, 524288]),
     ('4th order', LAB_FRAME_METHODS_O4, GORDON_METHODS_O4, 4,
-     [4096, 8192, 16384, 32768, 65536]),
+     [2048, 4096, 8192, 16384, 32768]),
 ]
 
 # Source strength and launch state. Repulsive, so the particle has a
