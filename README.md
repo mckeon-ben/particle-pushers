@@ -35,8 +35,9 @@ pip install .
 ```
 
 Use `pip install -e .` instead to work on the code in place. The
-scripts in `examples/` also need a LaTeX installation; see
-[Examples](#examples).
+scripts in `examples/` need nothing more by default; only the optional
+`--thesis` and `--journal` figure layouts of `plotting.py` need a LaTeX
+installation; see [Examples](#examples).
 
 ## Quick start
 
@@ -97,9 +98,8 @@ order, use `GordonExactOrderFour` or `GordonExactLabOrderFour`.
 
 ## Particles and fields
 
-A `Particle` holds a position `x`, a velocity `u`, a charge `q` and a
-mass `m`. The velocity is the spatial part of the 4-velocity,
-`u = gamma v`, not *v* itself. Lab-frame pushers use 3-vectors;
+A `Particle` holds a position `x`, a relativistic velocity `u`, a
+charge `q` and a mass `m`. Lab-frame pushers use 3-vectors;
 comoving-frame pushers use 4-vectors, as in the quick start.
 `lorentz_gamma(u)` returns the Lorentz factor, `sqrt(1 + |u|^2)`.
 
@@ -110,9 +110,11 @@ position and time (`TimeDependentField`):
   pusher uses;
 - `phi_func`, the scalar potential, needed by `DiscreteGradient`,
   `HairerDiscreteGradient` and `HairerVariational`;
-- `A_func`, `A_x_func` and, for time-dependent fields, `phi_t_func`
-  and `A_t_func`: the vector potential, its Jacobian and the time
-  derivatives, needed by `HairerVariational`.
+- `A_func`, `A_x_func` and, for time-dependent fields, `A_t_func`: the
+  vector potential, its Jacobian and its time derivative, needed by
+  `HairerVariational`;
+- `phi_t_func`, for time-dependent fields, the time derivative of the
+  scalar potential, also needed by `HairerVariational`.
 
 The base class `Field` is the identically zero field. Every quantity a
 field is not given also returns zero; see
@@ -178,21 +180,21 @@ component of the 4-position. Comparing the two at a common step size
 therefore needs the comoving-frame methods to take controlled lab-time
 steps.
 
-The `Lab` variants of the Gordon–Hafizi pushers do this. For each lab
-step `dt` they solve the trapezoidal relation
+The `Lab` variants of the Gordon–Hafizi pushers provide this control by
+converting each lab-time step `dt` into a proper-time step `dtau`. They
+find `dtau` by solving the trapezoidal relation
 
 ```text
 dt = dtau (gamma_n + gamma_{n+1}) / 2
 ```
 
-for the proper-time step `dtau` by fixed-point iteration. The relation
-is time-symmetric, so the lab-time step keeps the second-order,
-even-power error structure of the underlying proper-time method.
+by fixed-point iteration. The relation is time-symmetric, so the
+lab-time step keeps the second-order, even-power error structure of the
+underlying proper-time method.
 
-The fourth-order classes compose a symmetric second-order step three
-times with Yoshida's triple-jump coefficients. This needs a
-time-symmetric base step, which the explicit lab-frame methods and the
-Gordon–Hafizi methods provide, in both proper and lab time.
+The fourth-order classes are constructed via Yoshida composition. This
+needs a time-symmetric base step, which the explicit lab-frame methods
+and the Gordon–Hafizi methods provide, in both proper and lab time.
 
 ## Things to know
 
@@ -211,7 +213,7 @@ Gordon–Hafizi methods provide, in both proper and lab time.
 
 The scripts in `examples/` integrate the pushers over a fixed lab time
 at a sequence of step counts, second and fourth order, and write the
-final states to JSON:
+final states to a JSON file:
 
 | Script                  | Field                                           |
 | ----------------------- | ----------------------------------------------- |
