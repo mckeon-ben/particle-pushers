@@ -46,8 +46,8 @@ GORDON_METHODS_O2 = {
     'Gordon-Hafizi (exact)': GordonExactLab,
 }
 
-# Fourth-order (Yoshida triple-jump) counterparts. The display names
-# match the second-order ones so the two columns of the figure line up;
+# Fourth-order counterparts. The display names match the
+# second-order ones so the two columns of the figure line up;
 # the class name is stored in the data file to disambiguate.
 LAB_FRAME_METHODS_O4 = {
     'Boris': BorisOrderFour,
@@ -67,14 +67,12 @@ FAMILIES = [
      [1024, 2048, 4096, 8192, 16384]),
 ]
 
-# Electrode strength and period. AMPLITUDE is chosen so that the peak
-# field A k is unity at the plane, matching the undulator's B0.
+# Electrode strength and period.
 K_WAVE = 2.0 * np.pi
 AMPLITUDE = -1.0 / K_WAVE
 Q, M = 1.0, 1.0
 
-# Launch state: positive test particle skimming the surface along z,
-# one twentieth of a period above the plane.
+# Launch state.
 X_START = np.array([0.05, 0.0, 0.0])
 U_START = np.array([0.0, 0.0, 5.0])
 

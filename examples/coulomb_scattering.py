@@ -46,8 +46,8 @@ GORDON_METHODS_O2 = {
     'Gordon-Hafizi (exact)': GordonExactLab,
 }
 
-# Fourth-order (Yoshida triple-jump) counterparts. The display names
-# match the second-order ones so the two columns of the figure line up;
+# Fourth-order counterparts. The display names match the
+# second-order ones so the two columns of the figure line up;
 # the class name is stored in the data file to disambiguate.
 LAB_FRAME_METHODS_O4 = {
     'Boris': BorisOrderFour,
@@ -67,9 +67,7 @@ FAMILIES = [
      [2048, 4096, 8192, 16384, 32768]),
 ]
 
-# Source strength and launch state. Repulsive, so the particle has a
-# distance of closest approach and never reaches the singularity.
-# ALPHA / L = 2/3 here, well clear of the critical value 1.
+# Source strength and launch state.
 ALPHA = 1.0
 X_START = np.array([-10.0, 0.75, 0.0])
 U_START = np.array([2.0, 0.0, 0.0])

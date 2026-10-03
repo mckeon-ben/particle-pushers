@@ -46,8 +46,8 @@ GORDON_METHODS_O2 = {
     'Gordon-Hafizi (exact)': GordonExactLab,
 }
 
-# Fourth-order (Yoshida triple-jump) counterparts. The display names
-# match the second-order ones so the two columns of the figure line up;
+# Fourth-order counterparts. The display names match the
+# second-order ones so the two columns of the figure line up;
 # the class name is stored in the data file to disambiguate.
 LAB_FRAME_METHODS_O4 = {
     'Boris': BorisOrderFour,
@@ -67,24 +67,14 @@ FAMILIES = [
      [8192, 16384, 32768, 65536, 131072]),
 ]
 
-# Mirror geometry. alpha sets the axial curvature: the mirror ratio at
-# |z| = 1 is 1 + alpha, so alpha = 3 gives a ratio of 4 and a loss cone
-# of arcsin(1/2) = pi/6. B0 sets the gyrofrequency and so the separation
-# between the fast gyration and the slow bounce. PITCH is the launch
-# pitch angle from the field direction, in radians.
+# Mirror geometry.
 B0 = 20.0
 ALPHA = 3.0
 PITCH = np.pi / 3.0
 U_MAG = 0.5
 Q, M = 1.0, 1.0
 
-# Launch state, derived rather than written out so that it stays
-# consistent with the geometry above: the particle starts at the
-# midplane one gyroradius off axis, with the sign of u_perp chosen so
-# the magnetic force points back toward the axis, which puts the
-# guiding center on it. Trapping needs sin(PITCH)**2 above the inverse
-# mirror ratio 1/(1 + ALPHA); at PITCH = pi/3, ALPHA = 3 that is 0.75
-# against 0.25.
+# Launch state.
 X_START = np.array([U_MAG * np.sin(PITCH) / B0, 0.0, 0.0])
 U_START = np.array([0.0, -np.sign(Q) * U_MAG * np.sin(PITCH),
                     U_MAG * np.cos(PITCH)])

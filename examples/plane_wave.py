@@ -46,8 +46,8 @@ GORDON_METHODS_O2 = {
     'Gordon-Hafizi (exact)': GordonExactLab,
 }
 
-# Fourth-order (Yoshida triple-jump) counterparts. The display names
-# match the second-order ones so the two columns of the figure line up;
+# Fourth-order counterparts. The display names match the
+# second-order ones so the two columns of the figure line up;
 # the class name is stored in the data file to disambiguate.
 LAB_FRAME_METHODS_O4 = {
     'Boris': BorisOrderFour,
@@ -67,12 +67,12 @@ FAMILIES = [
      [4096, 8192, 16384, 32768, 65536]),
 ]
 
-# Wave parameters. omega = 2 pi makes the wave period 1.
+# Wave parameters.
 OMEGA = 2.0 * np.pi
 A0 = 10.0
 Q, M = 1.0, 1.0
 
-# Launch state: positive test particle at rest at the origin.
+# Launch state.
 X_START = np.zeros(3)
 U_START = np.zeros(3)
 

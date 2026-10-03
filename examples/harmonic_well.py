@@ -46,8 +46,8 @@ GORDON_METHODS_O2 = {
     'Gordon-Hafizi (exact)': GordonExactLab,
 }
 
-# Fourth-order (Yoshida triple-jump) counterparts. The display names
-# match the second-order ones so the two columns of the figure line up;
+# Fourth-order counterparts. The display names match the
+# second-order ones so the two columns of the figure line up;
 # the class name is stored in the data file to disambiguate.
 LAB_FRAME_METHODS_O4 = {
     'Boris': BorisOrderFour,
@@ -67,7 +67,7 @@ FAMILIES = [
      [2048, 4096, 8192, 16384, 32768]),
 ]
 
-# Launch state. Q = +1 so that the well confines.
+# Launch state.
 X_START = np.array([0.0, 1.0, 0.1])
 U_START = np.array([0.09, 0.05, 0.2])
 Q, M = 1.0, 1.0

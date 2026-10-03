@@ -46,8 +46,8 @@ GORDON_METHODS_O2 = {
     'Gordon-Hafizi (exact)': GordonExactLab,
 }
 
-# Fourth-order (Yoshida triple-jump) counterparts. The display names
-# match the second-order ones so the two columns of the figure line up;
+# Fourth-order counterparts. The display names match the
+# second-order ones so the two columns of the figure line up;
 # the class name is stored in the data file to disambiguate.
 LAB_FRAME_METHODS_O4 = {
     'Boris': BorisOrderFour,
@@ -67,14 +67,12 @@ FAMILIES = [
      [1024, 2048, 4096, 8192, 16384]),
 ]
 
-# Undulator strength and period. K = B0 / k is the undulator
-# parameter; below one the wiggle is a small perturbation on the
-# forward motion, which is the usual operating regime.
+# Undulator strength and period.
 B0 = 1.0
 K_WAVE = 2.0 * np.pi
 Q, M = 1.0, 1.0
 
-# Launch state: positive test particle injected along the axis.
+# Launch state.
 X_START = np.zeros(3)
 U_START = np.array([0.0, 0.0, 5.0])
 
