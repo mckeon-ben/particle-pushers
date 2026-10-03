@@ -202,7 +202,7 @@ def run_method(method_cls, x0, u0, q, m, field, T, n_list, is_gordon):
 def run_family(field, x0_3, u0_3, q, m, T, n_list, lab_methods,
                gordon_methods, label='', order=2):
     '''
-    Run one family and return its serialisable record.
+    Run one family and return its serializable record.
 
     Lab-frame methods take the 3-vector state; Gordon methods take the
     4-vector lift (lab time in x[0], gamma in u[0]).

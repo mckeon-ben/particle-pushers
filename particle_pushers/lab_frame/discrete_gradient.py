@@ -108,7 +108,7 @@ class DiscreteGradient(Pusher):
         -----
         Midpoint field quantities are evaluated at t_mid = t_n + dt / 2.
         When x1 and x2 coincide to within machine precision the discrete
-        gradient is singular, and the field at x1 evaluated at t_n is
+        gradient is singular, and the field at x1 evaluated at t_mid is
         returned instead.
 
         Note the argument order: the final position x2 precedes the
@@ -119,7 +119,7 @@ class DiscreteGradient(Pusher):
         delta_x = x2 - x1
         norm_delta_x = np.linalg.norm(delta_x)
         if norm_delta_x < np.finfo(float).eps:
-            return self.field.E(x1, t_n)
+            return self.field.E(x1, t_mid)
         E_bar_val = self.field.E(x_bar, t_mid)
         phi1 = self.field.phi(x1, t_mid)
         phi2 = self.field.phi(x2, t_mid)

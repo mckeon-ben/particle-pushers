@@ -29,7 +29,7 @@ class Boris(Pusher):
     -----
     - Second-order accurate in dt
     - Volume-preserving in phase space
-    - Correct E x B drift to leading order
+    - Does not preserve the E x B drift condition E + v x B = 0 (Vay, 2008)
     '''
 
     def _step(self, x, u, t_n, dt):

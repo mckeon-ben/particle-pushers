@@ -467,8 +467,12 @@ class HairerVariational(Hairer):
     -----
     - Second-order accurate in proper-time dtau
     - Preserves the mass shell condition u^mu u_mu = -1 up to O(dtau^2)
-    - Conserves the Hamiltonian H up to O(dtau^2)
-    - Derived from a discrete variational principle
+      over exponentially long times (Hairer et al., Theorem 5.3)
+    - Exactly conserves the discrete energy
+      m*gamma^{n+1/2} + q*(phi(x^n) + phi(x^{n+1}))/2 for static fields
+      (Theorem 5.2), and hence H = gamma*m + q*phi up to O(dtau^2)
+    - Symplectic and volume-preserving in the 8D phase space, being
+      derived from a discrete variational principle
     '''
 
     def _compute_jacobian(self, x, t):
@@ -476,9 +480,10 @@ class HairerVariational(Hairer):
         Construct the Jacobian of the 4-potential with respect to the
         4-position.
 
-        Assembles the 4x4 matrix partial_mu A_nu from the electric
-        field, partial time derivatives and spatial Jacobian of
-        the vector potential.
+        Assembles the 4x4 matrix A' = (partial_j A_i), row i the
+        component of the 4-potential A = (-phi; A) and column j the
+        derivative, with respect to x = (t; x). The spatial gradient
+        of -phi is E + A_t, since E = -grad phi - A_t.
 
         Parameters
         ----------
@@ -490,7 +495,7 @@ class HairerVariational(Hairer):
         Returns
         -------
         A_prime : np.ndarray
-            Jacobian matrix partial_mu A_nu, shape (4, 4).
+            Jacobian matrix A', shape (4, 4).
         '''
         E = self.field.E(x, t)
         A_x = self.field.A_x(x, t)
@@ -500,7 +505,7 @@ class HairerVariational(Hairer):
         A_prime = np.zeros((4, 4))
         A_prime[0, 0] = -phi_t
         A_prime[1:, 0] = A_t
-        A_prime[0, 1:] = E
+        A_prime[0, 1:] = E + A_t
         A_prime[1:, 1:] = A_x
 
         return A_prime

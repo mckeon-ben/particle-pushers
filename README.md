@@ -153,9 +153,9 @@ time. All four operators are explicit.
 | Quadratic | proper | `GordonQuadratic`    | `GordonQuadraticOrderFour`    |
 | Quadratic | lab    | `GordonQuadraticLab` | `GordonQuadraticLabOrderFour` |
 
-The exact operator solves the equations of motion exactly in a locally
-constant field. The quadratic operator is a rational approximation
-that preserves unit determinant and is exact for null fields.
+The exact operator updates the velocity exactly in a locally constant
+field. The quadratic operator is a rational approximation that
+preserves unit determinant and is exact for null fields.
 
 ### Comoving frame: Hairer–Lubich–Shi
 
@@ -217,7 +217,7 @@ final states to a JSON file:
 
 | Script                  | Field                                           |
 | ----------------------- | ----------------------------------------------- |
-| `charged_column.py`     | Radially growing axial field plus a line charge |
+| `charged_column.py`     | Radially growing axial field and 1/r^2 radial E |
 | `coulomb_scattering.py` | Coulomb field of a fixed point charge           |
 | `electrode_array.py`    | Vacuum field above a periodic electrode plane   |
 | `harmonic_well.py`      | Harmonic electrostatic well in an axial field   |

@@ -3,7 +3,7 @@ Base class for relativistic charged particle pushers.
 
 Provides the common interface and integration loop shared by all
 pusher implementations, together with the frame-agnostic Yoshida
-triple-jump composition used to lift symmetric second-order methods to
+composition used to lift symmetric second-order methods to
 fourth order. All quantities are in natural units where c = 1.
 
 References
@@ -180,7 +180,7 @@ class Pusher(ABC):
 
 class PusherOrderFour(Pusher):
     '''
-    Frame-agnostic Yoshida triple-jump fourth-order composition.
+    Frame-agnostic Yoshida fourth-order composition.
 
     Lifts a symmetric second-order pusher to fourth-order accuracy by applying
     its base step three times with coefficients (w1, w0, w1), where the

@@ -67,7 +67,7 @@ FAMILIES = [
      [4096, 8192, 16384, 32768, 65536]),
 ]
 
-# Field strength of the axial charge, and the launch state.
+# Strength of the radial electric field, and the launch state.
 K = 0.01
 X_START = np.array([0.9, 0.0, 0.0])
 U_START = np.array([0.1, 0.0, 0.0])
@@ -79,7 +79,7 @@ T = 256.0
 
 def column_field(k=K):
     '''
-    Axial field growing with radius, plus the potential of an axial charge.
+    Axial field growing with radius, plus a radial field -grad(k / r).
 
     E is written analytically rather than differenced from the potential,
     so it is curl-free to round-off.
@@ -87,7 +87,7 @@ def column_field(k=K):
     Parameters
     ----------
     k : float, optional
-        Field strength of the axial charge.
+        Strength of the radial electric field.
 
     Returns
     -------
@@ -205,7 +205,7 @@ def run_method(method_cls, x0, u0, q, m, field, T, n_list, is_gordon):
 def run_family(field, x0_3, u0_3, q, m, T, n_list, lab_methods,
                gordon_methods, label='', order=2):
     '''
-    Run one family and return its serialisable record.
+    Run one family and return its serializable record.
 
     Lab-frame methods take the 3-vector state; Gordon methods take the
     4-vector lift (lab time in x[0], gamma in u[0]).

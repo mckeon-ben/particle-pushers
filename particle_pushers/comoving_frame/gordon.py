@@ -235,13 +235,13 @@ class GordonExact(Gordon):
     Gordon-Hafizi pusher with exact time evolution operator.
 
     Computes the time evolution operator exactly via the matrix
-    exponential using hyperbolic functions. This is the exact solution
-    to the equations of motion in a locally constant field.
+    exponential using hyperbolic functions. The velocity update is
+    exact in a locally constant field; the position update is not.
 
     Notes
     -----
     - Second-order accurate in proper-time dtau
-    - Exact for uniform fields
+    - Velocity update exact for uniform fields
     '''
 
     def _compute_time_operator(self, F, field_invariant, dtau):
@@ -310,19 +310,13 @@ class GordonExactOrderFour(PusherOrderFour, GordonExact):
     Fourth-order Gordon-Hafizi pusher with exact time evolution operator.
 
     Combines the Yoshida fourth-order composition with the exact hyperbolic
-    time evolution operator from GordonExact. The exact operator is exact for
-    uniform fields at each sub-step, so the only per-step error is the
-    field-variation error, which the composition reduces to fourth order.
+    time evolution operator from GordonExact.
 
     Notes
     -----
     - Fourth-order accurate in proper-time dtau
-    - Exact for uniform fields at each sub-step
+    - Velocity update exact for uniform fields at each sub-step
     - Preserves unit determinant to machine precision
-
-    Because the exact operator is exact in a uniform field, the global error
-    converges at fourth order down to round-off, making this the preferred
-    choice when high accuracy is required.
 
     This is a comoving-frame method, so _lab_time is set to False: lab time
     rides in the zeroth component of the 4-position and the base _step()
@@ -488,15 +482,8 @@ class GordonQuadraticOrderFour(PusherOrderFour, GordonQuadratic):
 
     Notes
     -----
-    - Fourth-order accurate in proper-time dtau down to the accuracy floor
-      of the quadratic operator
+    - Fourth-order accurate in proper-time dtau
     - Unit determinant preserved by construction at each step
-
-    Unlike the exact operator, the quadratic operator is a rational (Pade)
-    approximation and is not exact even in a uniform field. It carries an
-    intrinsic per-step error that the composition cannot remove, so the global
-    error converges at fourth order only until it reaches a floor set by the
-    quadratic operator, below which refinement no longer improves accuracy.
 
     This is a comoving-frame method, so _lab_time is set to False: lab time
     rides in the zeroth component of the 4-position and the base _step()
@@ -570,13 +557,11 @@ class GordonQuadraticLabOrderFour(PusherOrderFour, GordonQuadraticLab):
     Lifts the lab-time-converted quadratic method (GordonQuadraticLab) to
     fourth order by Yoshida composition, routed through the
     conversion-wrapped step (_lab_step) exactly as in
-    GordonExactLabOrderFour. As with the proper-time quadratic fourth-order
-    method, the composition converges at fourth order only until it reaches
-    the accuracy floor set by the quadratic (Pade) operator.
+    GordonExactLabOrderFour.
 
     Notes
     -----
-    - Fourth-order accurate in lab-time dt down to the quadratic operator floor
+    - Fourth-order accurate in lab-time dt
     - Unit determinant preserved by construction at each sub-step
 
     The base step (_lab_step) carries lab time in the zeroth component of the
