@@ -92,7 +92,7 @@ class Hairer(Pusher):
             F[1:, i] = np.cross(-B, np.eye(3)[:, i - 1])
         return F
 
-    def _stagger(self, x, u, dt):
+    def _stagger(self, x, u, dtau):
         '''
         Stagger the position and velocity by half a time step.
 
@@ -107,7 +107,7 @@ class Hairer(Pusher):
             Initial 4-position, shape (4,).
         u : np.ndarray
             Initial 4-velocity, shape (4,).
-        dt : float
+        dtau : float
             Proper time step.
 
         Returns
@@ -118,9 +118,9 @@ class Hairer(Pusher):
             4-velocity at the first half-integer step, shape (4,).
         '''
         F = self._compute_F_tensor(x[1:], x[0])
-        u_new = (np.eye(4) + _M_INV @ F * self.q_over_m * dt / 2) @ u
+        u_new = (np.eye(4) + _M_INV @ F * self.q_over_m * dtau / 2) @ u
         u_new[0] = np.sqrt(1 + np.dot(u_new[1:], u_new[1:]))
-        x_new = x + u_new * dt
+        x_new = x + u_new * dtau
         return x_new, u_new
 
     def solve(self, t_span, N):
@@ -172,7 +172,7 @@ class Hairer(Pusher):
                 f't_span must satisfy t_start < t_end, '
                 f'got ({t_start}, {t_end})')
 
-        dt = (t_end - t_start) / N
+        dtau = (t_end - t_start) / N
         t = np.linspace(t_start, t_end, N + 1)
 
         n_dims = self.particle.x.size
@@ -181,13 +181,13 @@ class Hairer(Pusher):
         x_out[0] = self.particle.x
 
         x_out[1], u_out[0] = self._stagger(
-            self.particle.x, self.particle.u, dt
+            self.particle.x, self.particle.u, dtau
         )
         self.particle.x = x_out[1]
         self.particle.u = u_out[0]
 
         for n in range(1, N):
-            x_out[n + 1], u_out[n] = self.advance(t[n], dt)
+            x_out[n + 1], u_out[n] = self.advance(t[n], dtau)
             self.particle.x = x_out[n + 1]
             self.particle.u = u_out[n]
 
@@ -219,7 +219,7 @@ class Hairer(Pusher):
         return np.linalg.solve(np.eye(4) - A, (np.eye(4) + A) @ u)
 
     @abstractmethod
-    def _step(self, x, u, dt):
+    def _step(self, x, u, dtau):
         '''
         Perform a single integration step.
 
@@ -231,7 +231,7 @@ class Hairer(Pusher):
             Current 4-position, shape (4,).
         u : np.ndarray
             Current 4-velocity at the half-integer step, shape (4,).
-        dt : float
+        dtau : float
             Proper time step.
 
         Returns
@@ -281,12 +281,12 @@ class HairerExplicit(Hairer):
 
     Notes
     -----
-    - Second-order accurate in proper time step dt
+    - Second-order accurate in proper-time dtau
     - Preserves the mass shell condition u^mu u_mu = -1 exactly
     - Volume-preserving in phase space
     '''
 
-    def _step(self, x, u, dt):
+    def _step(self, x, u, dtau):
         '''
         Perform a single explicit Hairer-Lubich-Shi leapfrog step.
 
@@ -296,7 +296,7 @@ class HairerExplicit(Hairer):
             Current 4-position at integer step, shape (4,).
         u : np.ndarray
             Current 4-velocity at half-integer step, shape (4,).
-        dt : float
+        dtau : float
             Proper time step.
 
         Returns
@@ -307,8 +307,8 @@ class HairerExplicit(Hairer):
             Updated 4-velocity at the next half-integer step, shape (4,).
         '''
         F = self._compute_F_tensor(x[1:], x[0])
-        u_new = self._cayley_apply(_M_INV @ F * self.q_over_m * dt / 2, u)
-        x_new = x + u_new * dt
+        u_new = self._cayley_apply(_M_INV @ F * self.q_over_m * dtau / 2, u)
+        x_new = x + u_new * dtau
         return x_new, u_new
 
 
@@ -323,7 +323,7 @@ class HairerDiscreteGradient(Hairer):
 
     Notes
     -----
-    - Second-order accurate in proper time step dt
+    - Second-order accurate in proper-time dtau
     - Exactly conserves the Hamiltonian H = gamma*m + q*phi for static fields
     - Preserves the mass shell condition u^mu u_mu = -1 exactly
 
@@ -402,7 +402,7 @@ class HairerDiscreteGradient(Hairer):
         coeff = (phi2 - phi1 + np.dot(E_bar_val, delta_x)) / norm_delta_x**2
         return E_bar_val - coeff * delta_x
 
-    def _step(self, x, u, dt):
+    def _step(self, x, u, dtau):
         '''
         Perform a single implicit discrete gradient step.
 
@@ -416,7 +416,7 @@ class HairerDiscreteGradient(Hairer):
             Current 4-position at integer step, shape (4,).
         u : np.ndarray
             Current 4-velocity at half-integer step, shape (4,).
-        dt : float
+        dtau : float
             Proper time step.
 
         Returns
@@ -432,12 +432,12 @@ class HairerDiscreteGradient(Hairer):
             If the fixed-point iteration fails to converge.
         '''
         def iteration(u_k):
-            x_prev_half = x - u * (dt / 2)
-            x_next_half = x + u_k * (dt / 2)
+            x_prev_half = x - u * (dtau / 2)
+            x_next_half = x + u_k * (dtau / 2)
             E_bar = self._compute_E_bar(x_next_half, x_prev_half)
             F_bar = self._compute_F_tensor(x[1:], x[0], E=E_bar)
             return self._cayley_apply(
-                _M_INV @ F_bar * self.q_over_m * dt / 2, u)
+                _M_INV @ F_bar * self.q_over_m * dtau / 2, u)
 
         try:
             u_new = fixed_point(func=iteration, x0=u, xtol=1e-12)
@@ -446,7 +446,7 @@ class HairerDiscreteGradient(Hairer):
                 'Hairer-Lubich-Shi discrete gradient solver failed to '
                 f'converge: {e}') from e
 
-        x_new = x + u_new * dt
+        x_new = x + u_new * dtau
         return x_new, u_new
 
 
@@ -465,9 +465,9 @@ class HairerVariational(Hairer):
 
     Notes
     -----
-    - Second-order accurate in proper time step dt
-    - Preserves the mass shell condition u^mu u_mu = -1 up to O(dt^2)
-    - Conserves the Hamiltonian H up to O(dt^2)
+    - Second-order accurate in proper-time dtau
+    - Preserves the mass shell condition u^mu u_mu = -1 up to O(dtau^2)
+    - Conserves the Hamiltonian H up to O(dtau^2)
     - Derived from a discrete variational principle
     '''
 
@@ -505,7 +505,7 @@ class HairerVariational(Hairer):
 
         return A_prime
 
-    def _step(self, x, u, dt):
+    def _step(self, x, u, dtau):
         '''
         Perform a single implicit variational leapfrog step.
 
@@ -522,7 +522,7 @@ class HairerVariational(Hairer):
             Current 4-position at integer step, shape (4,).
         u : np.ndarray
             Current 4-velocity at half-integer step, shape (4,).
-        dt : float
+        dtau : float
             Proper time step.
 
         Returns
@@ -543,17 +543,17 @@ class HairerVariational(Hairer):
 
         # x_prev, phi_prev, A_prev, and A4_prev depend only on x and u,
         # both of which are fixed during iteration.
-        x_prev = x - u * dt
+        x_prev = x - u * dtau
         phi_prev = self.field.phi(x_prev[1:], x_prev[0])
         A_prev = self.field.A(x_prev[1:], x_prev[0])
         A4_prev = np.hstack((-phi_prev, A_prev))
 
-        cay_arg = _M_INV @ F_mod * self.q_over_m * dt / 2
+        cay_arg = _M_INV @ F_mod * self.q_over_m * dtau / 2
         lu_fac = lu_factor(np.eye(4) - cay_arg)
         num_fac = np.eye(4) + cay_arg
 
         def iteration(u_k):
-            x_next = x + u_k * dt
+            x_next = x + u_k * dtau
             phi_next = self.field.phi(x_next[1:], x_next[0])
             A_next = self.field.A(x_next[1:], x_next[0])
             A4_next = np.hstack((-phi_next, A_next))
@@ -568,5 +568,5 @@ class HairerVariational(Hairer):
                 'Hairer-Lubich-Shi variational solver failed to '
                 f'converge: {e}') from e
 
-        x_new = x + u_new * dt
+        x_new = x + u_new * dtau
         return x_new, u_new

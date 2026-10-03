@@ -240,7 +240,7 @@ class GordonExact(Gordon):
 
     Notes
     -----
-    - Second-order accurate in dt
+    - Second-order accurate in proper-time dtau
     - Exact for uniform fields
     '''
 
@@ -277,7 +277,7 @@ class GordonQuadratic(Gordon):
 
     Notes
     -----
-    - Second-order accurate in dt
+    - Second-order accurate in proper-time dtau
     - Unit determinant preserved by construction
     - Exact for null electromagnetic fields
     '''
@@ -316,7 +316,7 @@ class GordonExactOrderFour(PusherOrderFour, GordonExact):
 
     Notes
     -----
-    - Fourth-order accurate in dt
+    - Fourth-order accurate in proper-time dtau
     - Exact for uniform fields at each sub-step
     - Preserves unit determinant to machine precision
 
@@ -488,8 +488,8 @@ class GordonQuadraticOrderFour(PusherOrderFour, GordonQuadratic):
 
     Notes
     -----
-    - Fourth-order accurate in dt down to the accuracy floor of the quadratic
-      operator
+    - Fourth-order accurate in proper-time dtau down to the accuracy floor
+      of the quadratic operator
     - Unit determinant preserved by construction at each step
 
     Unlike the exact operator, the quadratic operator is a rational (Pade)
@@ -510,12 +510,12 @@ class GordonExactLabOrderFour(PusherOrderFour, GordonExactLab):
     Fourth-order lab-time-stepped Gordon-Hafizi pusher (exact operator).
 
     Lifts the lab-time-converted exact method (GordonExactLab) to fourth order
-    by Yoshida triple-jump composition. The composition is routed through the
+    by Yoshida composition. The composition is routed through the
     conversion-wrapped step (_lab_step), so each of the three weighted
-    sub-steps -- including the central backward sub-step -- solves its own
-    symmetric lab-time conversion. Because each lab-time sub-step is itself a
-    time-symmetric second-order map, the triple-jump cancels its leading
-    error and yields fourth-order accuracy in the lab-time step.
+    sub-steps solves its own symmetric lab-time conversion. Because each
+    lab-time sub-step is itself a time-symmetric second-order map, the
+    composition cancels its leading error and yields fourth-order accuracy
+    in the lab-time step.
 
     The three sub-steps are composed in controlled lab time, so this method
     is directly comparable at a common dt with a fourth-order lab-frame
@@ -537,7 +537,7 @@ class GordonExactLabOrderFour(PusherOrderFour, GordonExactLab):
         Route the Yoshida composition through the lab-time conversion.
 
         Overrides the default sub-step so that each weighted stage of
-        the triple jump solves its own symmetric lab-time conversion
+        the composition solves its own symmetric lab-time conversion
         via ``_lab_step``, rather than taking a raw proper-time
         ``_step``.
 
@@ -568,7 +568,7 @@ class GordonQuadraticLabOrderFour(PusherOrderFour, GordonQuadraticLab):
     Fourth-order lab-time-stepped Gordon-Hafizi pusher (quadratic operator).
 
     Lifts the lab-time-converted quadratic method (GordonQuadraticLab) to
-    fourth order by Yoshida triple-jump composition, routed through the
+    fourth order by Yoshida composition, routed through the
     conversion-wrapped step (_lab_step) exactly as in
     GordonExactLabOrderFour. As with the proper-time quadratic fourth-order
     method, the composition converges at fourth order only until it reaches
@@ -590,7 +590,7 @@ class GordonQuadraticLabOrderFour(PusherOrderFour, GordonQuadraticLab):
         Route the Yoshida composition through the lab-time conversion.
 
         Overrides the default sub-step so that each weighted stage of
-        the triple jump solves its own symmetric lab-time conversion
+        the composition solves its own symmetric lab-time conversion
         via ``_lab_step``, rather than taking a raw proper-time
         ``_step``.
 
