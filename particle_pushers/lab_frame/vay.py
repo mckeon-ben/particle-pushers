@@ -30,7 +30,7 @@ class Vay(Pusher):
 
     Notes
     -----
-    - Second-order accurate in dt
+    - Second-order accurate in lab-time dt
     - Correctly captures the E x B drift velocity
     - Not volume-preserving in general
     '''
@@ -98,7 +98,7 @@ class VayOrderFour(PusherOrderFour, Vay):
 
     Notes
     -----
-    - Fourth-order accurate in dt
+    - Fourth-order accurate in lab-time dt
     - Correctly captures the E x B drift velocity (inherited from Vay)
     '''
     pass

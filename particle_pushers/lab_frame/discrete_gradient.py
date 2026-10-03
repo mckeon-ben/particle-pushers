@@ -41,7 +41,7 @@ class DiscreteGradient(Pusher):
 
     Notes
     -----
-    - Second-order accurate in dt
+    - Second-order accurate in lab-time dt
     - Exactly conserves the single-particle Hamiltonian H = gamma*m + q*phi
       for static fields
     - Requires an explicit scalar potential phi

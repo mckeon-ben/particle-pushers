@@ -383,22 +383,26 @@ class HairerDiscreteGradient(Hairer):
         Notes
         -----
         The spatial separation is taken from components 1 to 3 of the
-        4-positions; the field and potential are sampled at the lab
-        time carried in component 0. When x1 and x2 coincide to within
-        machine precision the discrete gradient is singular, and the
-        field at x1 is returned instead.
+        4-positions. The field and both potentials are sampled at the
+        common lab time t_bar of the midpoint, as in the lab-frame
+        DiscreteGradient: sampling each potential at its own lab time
+        would add a spurious d(phi)/dt term of order one to E_bar.
+        When x1 and x2 coincide to within machine precision the
+        discrete gradient is singular, and the field at x1 evaluated
+        at t_bar is returned instead.
 
         Note the argument order: the later position x2 precedes the
         earlier position x1.
         '''
         x_bar = (x1 + x2) / 2
+        t_bar = x_bar[0]
         delta_x = x2[1:] - x1[1:]
         norm_delta_x = np.linalg.norm(delta_x)
-        E_bar_val = self.field.E(x_bar[1:], x_bar[0])
         if norm_delta_x < np.finfo(float).eps:
-            return self.field.E(x1[1:], x1[0])
-        phi1 = self.field.phi(x1[1:], x1[0])
-        phi2 = self.field.phi(x2[1:], x2[0])
+            return self.field.E(x1[1:], t_bar)
+        E_bar_val = self.field.E(x_bar[1:], t_bar)
+        phi1 = self.field.phi(x1[1:], t_bar)
+        phi2 = self.field.phi(x2[1:], t_bar)
         coeff = (phi2 - phi1 + np.dot(E_bar_val, delta_x)) / norm_delta_x**2
         return E_bar_val - coeff * delta_x
 

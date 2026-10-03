@@ -37,7 +37,7 @@ class Lapenta(Pusher):
 
     Notes
     -----
-    - Second-order accurate in dt
+    - Second-order accurate in lab-time dt
     - Fixed-point solve converges only for sufficiently small Omega*dt
     - Exactly energy-conserving in a fully coupled PIC scheme
 

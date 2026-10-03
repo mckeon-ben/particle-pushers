@@ -27,7 +27,7 @@ class Boris(Pusher):
 
     Notes
     -----
-    - Second-order accurate in dt
+    - Second-order accurate in lab-time dt
     - Volume-preserving in phase space
     - Does not preserve the E x B drift condition E + v x B = 0 (Vay, 2008)
     '''
@@ -75,7 +75,7 @@ class BorisOrderFour(PusherOrderFour, Boris):
 
     Notes
     -----
-    - Fourth-order accurate in dt
+    - Fourth-order accurate in lab-time dt
     - Volume-preserving in phase space (inherited from Boris)
     '''
     pass

@@ -32,7 +32,7 @@ class Higuera(Pusher):
 
     Notes
     -----
-    - Second-order accurate in dt
+    - Second-order accurate in lab-time dt
     - Volume-preserving in phase space
     - Correctly captures the E x B drift velocity
     '''
@@ -101,7 +101,7 @@ class HigueraOrderFour(PusherOrderFour, Higuera):
 
     Notes
     -----
-    - Fourth-order accurate in dt
+    - Fourth-order accurate in lab-time dt
     - Volume-preserving in phase space and correct E x B drift
       (inherited from Higuera-Cary)
     '''
