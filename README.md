@@ -215,15 +215,15 @@ The scripts in `examples/` integrate the pushers over a fixed lab time
 at a sequence of step counts, second and fourth order, and write the
 final states to a JSON file:
 
-| Script                  | Field                                           |
-| ----------------------- | ----------------------------------------------- |
-| `charged_column.py`     | Radially growing axial field and 1/r^2 radial E |
-| `coulomb_scattering.py` | Coulomb field of a fixed point charge           |
-| `electrode_array.py`    | Vacuum field above a periodic electrode plane   |
-| `harmonic_well.py`      | Harmonic electrostatic well in an axial field   |
-| `magnetic_mirror.py`    | Axisymmetric magnetic mirror                    |
-| `planar_undulator.py`   | Planar undulator, an exact vacuum field         |
-| `plane_wave.py`         | Linearly polarized monochromatic plane wave     |
+| Script                  | Field                                             |
+| ----------------------- | ------------------------------------------------- |
+| `charged_column.py`     | Radially growing axial field and $1/r^2$ radial E |
+| `coulomb_scattering.py` | Coulomb field of a fixed point charge             |
+| `electrode_array.py`    | Vacuum field above a periodic electrode plane     |
+| `harmonic_well.py`      | Harmonic electrostatic well in an axial field     |
+| `magnetic_mirror.py`    | Axisymmetric magnetic mirror                      |
+| `planar_undulator.py`   | Planar undulator, an exact vacuum field           |
+| `plane_wave.py`         | Linearly polarized monochromatic plane wave       |
 
 `plotting.py` turns the data files into error estimates, observed
 orders and convergence figures. The scripts can be run from any
