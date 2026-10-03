@@ -266,24 +266,23 @@ pyproject.toml
 README.md
 LICENSE
 particle_pushers/
-    __init__.py            public API
-    particle.py            Particle
-    field.py               Field, StaticField, TimeDependentField
-    lorentz.py             lorentz_gamma
-    pusher.py              Pusher, PusherOrderFour (base classes)
+    __init__.py                 public API
+    particle.py                 Particle
+    field.py                    Field, StaticField, TimeDependentField
+    lorentz.py                  lorentz_gamma
+    pusher.py                   Pusher, PusherOrderFour (base classes)
     lab_frame/
-        boris.py           Boris, BorisOrderFour
-        vay.py             Vay, VayOrderFour
-        higuera.py         Higuera, HigueraOrderFour
-        lapenta.py         Lapenta
-        discrete_gradient.py
-                           DiscreteGradient
+        boris.py                Boris, BorisOrderFour
+        vay.py                  Vay, VayOrderFour
+        higuera.py              Higuera, HigueraOrderFour
+        lapenta.py              Lapenta
+        discrete_gradient.py    DiscreteGradient
     comoving_frame/
-        gordon.py          Gordon-Hafizi pushers, proper and lab time
-        hairer.py          Hairer-Lubich-Shi pushers
+        gordon.py               Gordon-Hafizi pushers, proper and lab time
+        hairer.py               Hairer-Lubich-Shi pushers
 examples/
-    <test field>.py        seven simulation scripts
-    plotting.py            error estimates and figures
+    <test field>.py             seven simulation scripts
+    plotting.py                 error estimates and figures
 ```
 
 ## License
