@@ -256,8 +256,7 @@ Both `--thesis` and `--journal` need a local LaTeX installation: the
 `cm-super` fonts for the thesis page. Each layout ends the figure's
 name its own way, so drawing the same data for two pages leaves two
 files rather than one. The `LAYOUTS` table at the top of the script
-holds each page's width, lettering and renderer; a thesis class with
-margins other than 25 mm needs its own `\textwidth` in `THESIS_WIDTH`.
+holds each page's width, lettering and renderer.
 
 ## Package layout
 
