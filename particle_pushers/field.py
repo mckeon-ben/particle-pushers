@@ -17,8 +17,7 @@ class Field:
 
     Defines the interface for all field classes. All methods return
     zero by default, allowing subclasses to override only the
-    quantities they define. All quantities are in natural units
-    where c = 1.
+    quantities they define.
 
     All spatial quantities are 3-vectors and all temporal quantities
     are scalars unless otherwise stated.
@@ -265,8 +264,8 @@ class TimeDependentField(Field):
 
     Examples
     --------
-    Plane wave propagating in the z-direction, polarized in x
-    (with omega = k = 1.0 in natural units where c = 1):
+    Plane wave propagating in the z-direction, polarized in x, with
+    omega = k = 1.0:
 
     >>> omega, k, E0 = 1.0, 1.0, 0.1
     >>> E_func = lambda x, t: [E0 * np.cos(omega * t - k * x[2]), 0., 0.]

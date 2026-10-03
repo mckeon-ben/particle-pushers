@@ -28,8 +28,6 @@ class Pusher(ABC):
     implementations. Concrete subclasses must implement the advance()
     method, which defines the specific time-stepping algorithm.
 
-    All quantities are in natural units where c = 1.
-
     Parameters
     ----------
     particle : Particle

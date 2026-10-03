@@ -16,8 +16,7 @@ class Particle:
 
     Stores the particle's kinematic state and physical properties.
     The position and velocity may be either 3-vectors for lab-frame
-    pushers or 4-vectors for comoving-frame pushers. All quantities
-    are in natural units where c = 1.
+    pushers or 4-vectors for comoving-frame pushers.
 
     Attributes
     ----------

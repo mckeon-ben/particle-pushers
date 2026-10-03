@@ -9,7 +9,7 @@ units where c = 1. Lab-frame methods integrate in lab time, and
 comoving-frame methods in proper time or, through a symmetric time
 conversion, in lab time. The base methods are second-order accurate;
 fourth-order variants of the explicit lab-frame methods and the
-Gordon-Hafizi methods are provided via Yoshida triple-jump composition.
+Gordon-Hafizi methods are provided via Yoshida composition.
 
 Classes
 -------
