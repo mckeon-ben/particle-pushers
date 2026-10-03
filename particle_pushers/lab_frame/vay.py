@@ -94,7 +94,7 @@ class Vay(Pusher):
 
 class VayOrderFour(PusherOrderFour, Vay):
     '''
-    Fourth-order Vay pusher via Yoshida triple-jump composition.
+    Fourth-order Vay pusher via Yoshida composition.
 
     Notes
     -----

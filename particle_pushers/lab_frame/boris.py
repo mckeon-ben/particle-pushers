@@ -71,7 +71,7 @@ class Boris(Pusher):
 
 class BorisOrderFour(PusherOrderFour, Boris):
     '''
-    Fourth-order Boris pusher via Yoshida triple-jump composition.
+    Fourth-order Boris pusher via Yoshida composition.
 
     Notes
     -----

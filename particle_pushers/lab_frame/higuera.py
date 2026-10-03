@@ -97,7 +97,7 @@ class Higuera(Pusher):
 
 class HigueraOrderFour(PusherOrderFour, Higuera):
     '''
-    Fourth-order Higuera-Cary pusher via Yoshida triple-jump composition.
+    Fourth-order Higuera-Cary pusher via Yoshida composition.
 
     Notes
     -----
