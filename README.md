@@ -135,8 +135,8 @@ velocities.
 | Boris             | `Boris`            | `BorisOrderFour`   | explicit |
 | Vay               | `Vay`              | `VayOrderFour`     | explicit |
 | Higuera–Cary      | `Higuera`          | `HigueraOrderFour` | explicit |
-| Lapenta–Markidis  | `Lapenta`          | ---                | implicit |
-| Discrete gradient | `DiscreteGradient` | ---                | implicit |
+| Lapenta–Markidis  | `Lapenta`          | —                  | implicit |
+| Discrete gradient | `DiscreteGradient` | —                  | implicit |
 
 `DiscreteGradient` conserves the energy `gamma m + q phi` exactly for
 static fields.
