@@ -217,7 +217,7 @@ final states to a JSON file:
 
 | Script                  | Field                                             |
 | ----------------------- | ------------------------------------------------- |
-| `charged_column.py`     | Radially growing axial field and $1/r^2$ radial E |
+| `charged_column.py`     | Radially growing axial field and `1/r^2` radial E |
 | `coulomb_scattering.py` | Coulomb field of a fixed point charge             |
 | `electrode_array.py`    | Vacuum field above a periodic electrode plane     |
 | `harmonic_well.py`      | Harmonic electrostatic well in an axial field     |
